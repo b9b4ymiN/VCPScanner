@@ -22,6 +22,7 @@ Stock scanner for the Stock Exchange of Thailand (SET) using **Volatility Contra
 - **Dark Pro-Trader UI** — Candlestick chart, SEPA score ring, VCP contraction chart, criteria breakdown
 - **PWA** — Installable with offline support via service worker
 - **Visitor Counter** — Daily/total page view tracking
+- **Portfolio Simulation** — 100K THB paper trading with auto entry/exit (SL/TP/TIME), equity curve, trade history
 - **Auto Scheduling** — EOD scan at 16:30 Bangkok time, Mon–Fri via Cloudflare Cron
 
 ---
@@ -124,7 +125,9 @@ vcpSystem/
 │   ├── src/
 │   │   ├── App.tsx           # Main layout shell
 │   │   ├── api/              # API client + TanStack Query hooks
-│   │   ├── components/       # UI components (CSS Modules)
+│   │   ├── components/       # UI components (CSS Modules, incl. PortfolioView)
+│   │   │   ├── PortfolioView.tsx
+│   │   │   └── PortfolioView.module.css
 │   │   ├── stores/           # Zustand UI state
 │   │   ├── lib/              # Formatting utilities
 │   │   └── styles/           # Design tokens + globals
@@ -135,7 +138,13 @@ vcpSystem/
 │   └── manual-scan.ts        # CLI scan runner
 ├── data/
 │   └── vcp.db                # SQLite database
-├── drizzle/                  # Migration files
+├── worker/
+│   ├── src/
+│   │   ├── index.ts          # Worker entry (Hono routes + queue consumer)
+│   │   ├── schema.ts         # Drizzle tables (alerts, portfolios, positions, snapshots)
+│   │   ├── simulation.ts     # EOD portfolio simulation engine
+│   │   └── board-lot.ts      # SET board lot tier helper
+│   └── drizzle/              # Migration files
 ├── ARCHITECTURE-v2.md        # Full architecture document
 ├── DESIGN.md                 # UI design system specification
 ├── BLUEPRINT.md              # VCP/SEPA algorithm reference
@@ -155,6 +164,11 @@ vcpSystem/
 | `GET` | `/api/views` | Daily/total page views |
 | `POST` | `/api/views` | Track page view |
 | `POST` | `/api/scan/trigger` | Trigger a manual scan (queues batch processing) |
+| `POST` | `/api/portfolio/init` | Create simulated portfolio (100K THB) |
+| `GET` | `/api/portfolio` | Active portfolio + open positions + latest snapshot |
+| `GET` | `/api/portfolio/snapshots` | Daily snapshots (query: `days`) |
+| `GET` | `/api/portfolio/trades` | Closed positions (query: `limit`) |
+| `POST` | `/api/portfolio/reset` | Force-close positions, reset portfolio |
 
 ### Example Response — Alerts
 

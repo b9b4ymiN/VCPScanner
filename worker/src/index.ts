@@ -1,9 +1,10 @@
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
 import { getDb } from './db'
-import { alerts, scanRuns, symbols, pageViews } from './schema'
+import { alerts, scanRuns, symbols, pageViews, portfolios, positions, dailySnapshots } from './schema'
 import { eq, gte, desc, and, count, sql } from 'drizzle-orm'
 import { YahooFetchProvider } from './providers/yahoo'
+import { simulateEOD } from './simulation'
 import type { Market, PriceData, PricePeriod, Fundamentals } from '../../server/core/types'
 import { VcpMinerviniStrategy } from '../../server/strategies/vcp-minervini'
 import { evaluateTrendTemplate } from '../../server/strategies/_shared/trend-template'
@@ -174,6 +175,83 @@ app.post('/api/views', async (c) => {
   return c.json({ total: totalRow?.total ?? 0, todayDate: today })
 })
 
+// ─── Portfolio ───
+
+app.post('/api/portfolio/init', async (c) => {
+  const db = getDb(c.env.DB)
+  const now = new Date().toISOString()
+
+  await db.update(portfolios).set({ status: 'closed', updatedAt: now }).where(eq(portfolios.status, 'active'))
+
+  const inserted = await db.insert(portfolios).values({
+    name: 'VCP Sim',
+    initialCap: 100000,
+    cashBalance: 100000,
+    totalValue: 100000,
+    status: 'active',
+    createdAt: now,
+    updatedAt: now,
+  }).returning({ id: portfolios.id })
+
+  return c.json({ portfolio: inserted[0] })
+})
+
+app.get('/api/portfolio', async (c) => {
+  const db = getDb(c.env.DB)
+  const port = await db.select().from(portfolios).where(eq(portfolios.status, 'active')).limit(1)
+  if (!port.length) return c.json({ portfolio: null, positions: [], snapshot: null })
+
+  const portId = port[0]!.id
+  const [openPos, latestSnap] = await Promise.all([
+    db.select().from(positions).where(and(eq(positions.portfolioId, portId), eq(positions.status, 'open'))),
+    db.select().from(dailySnapshots).where(eq(dailySnapshots.portfolioId, portId)).orderBy(desc(dailySnapshots.date)).limit(1),
+  ])
+
+  return c.json({ portfolio: port[0], positions: openPos, snapshot: latestSnap[0] ?? null })
+})
+
+app.get('/api/portfolio/snapshots', async (c) => {
+  const db = getDb(c.env.DB)
+  const days = Math.min(Number(c.req.query('days') ?? 30), 365)
+  const port = await db.select().from(portfolios).where(eq(portfolios.status, 'active')).limit(1)
+  if (!port.length) return c.json({ snapshots: [] })
+
+  const rows = await db.select().from(dailySnapshots)
+    .where(eq(dailySnapshots.portfolioId, port[0]!.id))
+    .orderBy(desc(dailySnapshots.date)).limit(days)
+  return c.json({ snapshots: rows })
+})
+
+app.get('/api/portfolio/trades', async (c) => {
+  const db = getDb(c.env.DB)
+  const limit = Math.min(Number(c.req.query('limit') ?? 50), 500)
+  const port = await db.select().from(portfolios).where(eq(portfolios.status, 'active')).limit(1)
+  if (!port.length) return c.json({ trades: [] })
+
+  const rows = await db.select().from(positions)
+    .where(and(eq(positions.portfolioId, port[0]!.id), eq(positions.status, 'closed')))
+    .orderBy(desc(positions.exitDate)).limit(limit)
+  return c.json({ trades: rows })
+})
+
+app.post('/api/portfolio/reset', async (c) => {
+  const db = getDb(c.env.DB)
+  const now = new Date().toISOString()
+  const port = await db.select().from(portfolios).where(eq(portfolios.status, 'active')).limit(1)
+  if (port.length) {
+    await db.update(positions).set({ exitDate: now, exitPrice: sql`${positions.entryPrice}`, exitReason: 'RESET', pnl: 0, pnlPct: 0, status: 'closed' })
+      .where(and(eq(positions.portfolioId, port[0]!.id), eq(positions.status, 'open')))
+    await db.update(portfolios).set({ status: 'closed', updatedAt: now }).where(eq(portfolios.id, port[0]!.id))
+  }
+
+  const inserted = await db.insert(portfolios).values({
+    name: 'VCP Sim', initialCap: 100000, cashBalance: 100000, totalValue: 100000,
+    status: 'active', createdAt: now, updatedAt: now,
+  }).returning({ id: portfolios.id })
+
+  return c.json({ portfolio: inserted[0] })
+})
+
 // ─── Trigger Scan ───
 
 app.post('/api/scan/trigger', async (c) => {
@@ -218,6 +296,11 @@ interface ScanMessage {
   strategyId: string
   scanId: number
   totalSymbols: number
+}
+
+interface SimMessage {
+  type: 'simulate'
+  date: string
 }
 
 async function processBatch(env: Bindings, msg: ScanMessage): Promise<{ scanned: number; passed: number }> {
@@ -355,6 +438,13 @@ async function processBatch(env: Bindings, msg: ScanMessage): Promise<{ scanned:
     WHERE id = ${scanId}
   `)
 
+  // Trigger simulation if scan just completed
+  const completed = await db.select({ status: scanRuns.status }).from(scanRuns).where(eq(scanRuns.id, scanId)).limit(1)
+  if (completed[0]?.status === 'success') {
+    const today = new Date().toISOString().slice(0, 10)
+    await env.SCAN_QUEUE.send({ type: 'simulate', date: today } as SimMessage)
+  }
+
   return { scanned, passed }
 }
 
@@ -392,7 +482,12 @@ export default {
   async queue(batch: MessageBatch, env: Bindings, _ctx: ExecutionContext) {
     for (const msg of batch.messages) {
       try {
-        await processBatch(env, msg.body as ScanMessage)
+        const body = msg.body as unknown
+        if ((body as SimMessage).type === 'simulate') {
+          await simulateEOD(env, (body as SimMessage).date)
+        } else {
+          await processBatch(env, body as ScanMessage)
+        }
         msg.ack()
       } catch (err) {
         console.error('[queue] Batch failed:', err)

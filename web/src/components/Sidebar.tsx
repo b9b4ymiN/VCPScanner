@@ -1,7 +1,7 @@
-import { Bell, ClockCounterClockwise, Gear, X } from '@phosphor-icons/react'
+import { Bell, ChartLineUp, ClockCounterClockwise, Gear, X } from '@phosphor-icons/react'
 import styles from './Sidebar.module.css'
 
-type Tab = 'alerts' | 'history' | 'config'
+type Tab = 'alerts' | 'history' | 'config' | 'portfolio'
 
 interface Props {
   active: Tab
@@ -37,6 +37,13 @@ export function Sidebar({ active, onTabChange, lastScan, isRunning, open, onClos
           >
             <ClockCounterClockwise size={18} />
             <span className={styles.navLabel}>History</span>
+          </button>
+          <button
+            className={`${styles.tab} ${active === 'portfolio' ? styles.active : ''}`}
+            onClick={() => onTabChange('portfolio')}
+          >
+            <ChartLineUp size={18} />
+            <span className={styles.navLabel}>Portfolio</span>
           </button>
           <button
             className={`${styles.tab} ${active === 'config' ? styles.active : ''}`}

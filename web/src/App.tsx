@@ -6,6 +6,7 @@ import { AlertTable } from './components/AlertTable'
 import { AlertDetailView } from './components/AlertDetailView'
 import { HistoryView } from './components/HistoryView'
 import { ConfigView } from './components/ConfigView'
+import { PortfolioView } from './components/PortfolioView'
 import { ToastContainer } from './components/Toast'
 import { useAlerts, useStatus } from './api/hooks'
 import { useUiStore } from './stores/ui'
@@ -49,7 +50,7 @@ export function App() {
     return a.symbol.toUpperCase().includes(q) || (a.name?.toUpperCase().includes(q) ?? false)
   })
 
-  const handleTabChange = (tab: 'alerts' | 'history' | 'config') => {
+  const handleTabChange = (tab: 'alerts' | 'history' | 'config' | 'portfolio') => {
     if (tab === 'alerts') {
       clearSelectedDate()
       setSelectedSymbol(null)
@@ -111,6 +112,7 @@ export function App() {
             </>
           )}
           {sidebarTab === 'history' && <HistoryView />}
+          {sidebarTab === 'portfolio' && <PortfolioView />}
           {sidebarTab === 'config' && <ConfigView />}
         </main>
         {selectedAlert && sidebarTab === 'alerts' && (

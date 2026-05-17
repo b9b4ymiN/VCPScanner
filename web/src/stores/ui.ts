@@ -8,7 +8,7 @@ interface UiState {
   minScore: number
   ttFilter: number | null
   searchQuery: string
-  sidebarTab: 'alerts' | 'history' | 'config'
+  sidebarTab: 'alerts' | 'history' | 'config' | 'portfolio'
   sidebarOpen: boolean
 
   setSelectedSymbol: (symbol: string | null) => void

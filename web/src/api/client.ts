@@ -1,4 +1,4 @@
-import type { AlertsResponse, HistoryResponse, StatusResponse, StockDetail } from './types'
+import type { AlertsResponse, HistoryResponse, StatusResponse, StockDetail, PortfolioResponse, SnapshotsResponse, TradesResponse } from './types'
 
 const API_ORIGIN = import.meta.env.VITE_API_URL ?? ''
 const BASE = `${API_ORIGIN}/api`
@@ -54,4 +54,30 @@ export function fetchViews(): Promise<import('./types').ViewsResponse> {
 
 export function trackView(): Promise<import('./types').ViewsResponse> {
   return fetch(`${BASE}/views`, { method: 'POST' }).then(r => r.json())
+}
+
+// ─── Portfolio ───
+
+export function fetchPortfolio(): Promise<PortfolioResponse> {
+  return fetchJson<PortfolioResponse>(`${BASE}/portfolio`)
+}
+
+export function initPortfolio(): Promise<{ portfolio: { id: number } }> {
+  return fetch(`${BASE}/portfolio/init`, { method: 'POST' }).then(r => r.json())
+}
+
+export function fetchSnapshots(days?: number): Promise<SnapshotsResponse> {
+  const sp = new URLSearchParams()
+  if (days !== undefined) sp.set('days', String(days))
+  return fetchJson<SnapshotsResponse>(`${BASE}/portfolio/snapshots?${sp}`)
+}
+
+export function fetchTrades(limit?: number): Promise<TradesResponse> {
+  const sp = new URLSearchParams()
+  if (limit !== undefined) sp.set('limit', String(limit))
+  return fetchJson<TradesResponse>(`${BASE}/portfolio/trades?${sp}`)
+}
+
+export function resetPortfolio(): Promise<{ portfolio: { id: number } }> {
+  return fetch(`${BASE}/portfolio/reset`, { method: 'POST' }).then(r => r.json())
 }

@@ -115,3 +115,67 @@ export interface ViewsResponse {
 }
 
 export interface StockDetail extends Alert {}
+
+// ─── Portfolio Simulation ───
+
+export interface Portfolio {
+  id: number
+  name: string
+  initialCap: number
+  cashBalance: number
+  totalValue: number
+  totalPnL: number
+  totalPnLPct: number
+  status: string
+  createdAt: string
+  updatedAt: string
+}
+
+export interface Position {
+  id: number
+  portfolioId: number
+  symbol: string
+  entryDate: string
+  entryPrice: number
+  stopPrice: number
+  targetPrice: number
+  pivotPrice: number
+  quantity: number
+  costBasis: number
+  exitDate: string | null
+  exitPrice: number | null
+  exitReason: string | null
+  pnl: number | null
+  pnlPct: number | null
+  status: 'open' | 'closed'
+  sepaScore: number | null
+  vcpQuality: string | null
+  createdAt: string
+}
+
+export interface DailySnapshot {
+  id: number
+  portfolioId: number
+  date: string
+  cashBalance: number
+  positionsValue: number
+  totalValue: number
+  dailyPnL: number
+  dailyPnLPct: number
+  openCount: number
+  closedCount: number
+}
+
+export interface PortfolioResponse {
+  portfolio: Portfolio | null
+  positions: Position[]
+  snapshot: DailySnapshot | null
+}
+
+export interface SnapshotsResponse {
+  snapshots: DailySnapshot[]
+}
+
+export interface TradesResponse {
+  trades: Position[]
+}
