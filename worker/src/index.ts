@@ -268,19 +268,21 @@ async function processBatch(env: Bindings, msg: ScanMessage): Promise<{ scanned:
       const breakout = calcBreakoutStatus(prices)
       const volumeRatio = calcVolumeRatio(recent.map(p => p.volume))
 
-      const currentPrice = result.details.price
+      const pivot = vcp.pivotPrice
       let entryPrice: number | null = null
       let stopPrice: number | null = null
       let targetPrice: number | null = null
       let riskRewardRatio: number | null = null
       let riskPct: number | null = null
 
-      if (atr14 && atr14 > 0) {
-        stopPrice = currentPrice - 2 * atr14
-        targetPrice = currentPrice + 3 * atr14
-        riskPct = ((currentPrice - stopPrice) / currentPrice) * 100
-        riskRewardRatio = (targetPrice - currentPrice) / (currentPrice - stopPrice)
-        entryPrice = currentPrice
+      if (pivot != null && pivot > 0 && Number.isFinite(pivot)) {
+        const entryZoneHigh = pivot * 1.01
+        stopPrice = pivot * 0.92
+        const risk = entryZoneHigh - stopPrice
+        targetPrice = entryZoneHigh + 3 * risk
+        riskPct = ((pivot - stopPrice) / pivot) * 100
+        riskRewardRatio = 3.0
+        entryPrice = pivot
       }
 
       const values = {
@@ -320,7 +322,7 @@ async function processBatch(env: Bindings, msg: ScanMessage): Promise<{ scanned:
           ...result.details,
           trendTemplate,
           technicals: { rsi14, adx14, bbWidth: bb?.bandwidth ?? null, bbPercentB: bb?.percentB ?? null, atr14, high52w: w52?.high52w ?? null, distance52w: w52?.distance ?? null },
-          tradePlan: atr14 ? { entryPrice, stopPrice, targetPrice, riskPct, rewardRiskRatio: riskRewardRatio } : null,
+          tradePlan: pivot != null ? { entryPrice, entryZoneLow: pivot, entryZoneHigh: pivot * 1.01, stopPrice, targetPrice, riskPct, rewardRiskRatio: riskRewardRatio } : null,
           tags: {
             turnaround: fundamentals.epsGrowthYoY != null && fundamentals.epsGrowthYoY > 0.5,
             blueSky: breakout?.status === 'BLUE_SKY',

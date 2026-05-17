@@ -15,7 +15,7 @@ interface Details {
   setup?: { vcpPatternLabel?: string; proximity52wPct?: number | null; breakoutStatus?: string }
   profile?: { sector?: string | null; industry?: string | null; dividendYield?: number | null; recommendationKey?: string | null }
   technicals?: { rsi14?: number | null; adx14?: number | null; bbWidth?: number | null; atr14?: number | null; high52w?: number | null; distance52w?: number | null }
-  tradePlan?: { entryPrice?: number; stopPrice?: number; targetPrice?: number; riskPct?: number; rewardRiskRatio?: number } | null
+  tradePlan?: { entryPrice?: number; entryZoneLow?: number; entryZoneHigh?: number; stopPrice?: number; targetPrice?: number; riskPct?: number; rewardRiskRatio?: number } | null
   vcp?: { swingHighs?: [number, number][]; swingLows?: [number, number][]; pivotPrice?: number }
   trendTemplate?: { score: number; conditions: boolean[]; labels: string[]; rsPercentile: number | null }
 }
@@ -237,23 +237,28 @@ export function AlertDetailView({ alert, onClose }: Props) {
         {/* Trade Plan */}
         {tradePlan && (
           <div className={styles.section}>
-            <h4 className={styles.sectionTitle}>Trade Plan</h4>
+            <h4 className={styles.sectionTitle}>Trade Plan (Pivot-based)</h4>
             <div className={styles.tradeGrid}>
               <div className={styles.tradeCard}>
-                <span className={styles.tradeLabel}>Entry</span>
-                <span className={styles.tradeValue}>{tradePlan.entryPrice != null ? formatPrice(tradePlan.entryPrice) : '—'}</span>
+                <span className={styles.tradeLabel}>Entry Zone</span>
+                <span className={styles.tradeValue}>
+                  {tradePlan.entryZoneLow != null && tradePlan.entryZoneHigh != null
+                    ? `${formatPrice(tradePlan.entryZoneLow)} — ${formatPrice(tradePlan.entryZoneHigh)}`
+                    : '—'}
+                </span>
               </div>
               <div className={`${styles.tradeCard} ${styles.stopCard}`}>
-                <span className={styles.tradeLabel}>Stop</span>
+                <span className={styles.tradeLabel}>Stop (Pivot -8%)</span>
                 <span className={styles.tradeValue}>{tradePlan.stopPrice != null ? formatPrice(tradePlan.stopPrice) : '—'}</span>
               </div>
               <div className={`${styles.tradeCard} ${styles.targetCard}`}>
-                <span className={styles.tradeLabel}>Target</span>
+                <span className={styles.tradeLabel}>Target (3:1)</span>
                 <span className={styles.tradeValue}>{tradePlan.targetPrice != null ? formatPrice(tradePlan.targetPrice) : '—'}</span>
               </div>
             </div>
             <div className={styles.tradeMeta}>
-              <span>R:R <strong>{tradePlan.rewardRiskRatio != null ? `${tradePlan.rewardRiskRatio.toFixed(1)}` : '—'}</strong></span>
+              <span>Pivot <strong>{alert.pivotPrice != null ? formatPrice(alert.pivotPrice) : '—'}</strong></span>
+              <span>R:R <strong>{tradePlan.rewardRiskRatio != null ? `${tradePlan.rewardRiskRatio.toFixed(1)}:1` : '—'}</strong></span>
               <span>Risk <strong>{tradePlan.riskPct != null ? `${tradePlan.riskPct.toFixed(1)}%` : '—'}</strong></span>
             </div>
           </div>
