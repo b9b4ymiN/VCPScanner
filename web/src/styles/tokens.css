@@ -1,0 +1,84 @@
+:root {
+  /* === BACKGROUNDS === */
+  --bg-canvas:    #0A0A0B;
+  --bg-surface:   #111114;
+  --bg-elevated:  #18181C;
+  --bg-hover:     #1E1E24;
+  --bg-active:    #252530;
+  --bg-border:    #202028;
+
+  /* === ORANGE ACCENT === */
+  --orange-50:    #FFF3E8;
+  --orange-100:   #FFD4A8;
+  --orange-200:   #FFB573;
+  --orange-400:   #FF7A1A;
+  --orange-500:   #F56900;
+  --orange-600:   #C45200;
+  --orange-700:   #8A3800;
+
+  /* === SEMANTIC === */
+  --green-400:    #22C55E;
+  --green-500:    #16A34A;
+  --green-dim:    rgba(34,197,94,0.12);
+
+  --red-400:      #EF4444;
+  --red-500:      #DC2626;
+  --red-dim:      rgba(239,68,68,0.12);
+
+  --yellow-400:   #EAB308;
+  --yellow-dim:   rgba(234,179,8,0.12);
+
+  --blue-400:     #60A5FA;
+  --blue-dim:     rgba(96,165,250,0.10);
+
+  --purple-400:   #A78BFA;
+  --purple-dim:   rgba(167,139,250,0.10);
+
+  /* === TEXT === */
+  --text-primary:   #F0EFF4;
+  --text-secondary: #8B8A96;
+  --text-tertiary:  #4A4956;
+  --text-inverse:   #0A0A0B;
+
+  /* === VCP QUALITY === */
+  --vcp-tight:    #A78BFA;
+  --vcp-standard: #F56900;
+  --vcp-wide:     #EAB308;
+  --vcp-loose:    #4A4956;
+
+  /* === ALERT LEVELS === */
+  --alert-high:   #F56900;
+  --alert-medium: #EAB308;
+  --alert-watch:  #60A5FA;
+
+  /* === FONTS === */
+  --font-data: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+  --font-ui:   'Inter', 'SF Pro Display', system-ui, sans-serif;
+  --font-thai: 'Noto Sans Thai', 'Sarabun', var(--font-ui);
+
+  /* === SPACING === */
+  --space-1:  4px;
+  --space-2:  8px;
+  --space-3:  12px;
+  --space-4:  16px;
+  --space-5:  20px;
+  --space-6:  24px;
+  --space-8:  32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* === RADIUS === */
+  --radius-sm:   4px;
+  --radius-md:   6px;
+  --radius-lg:   10px;
+  --radius-xl:   14px;
+  --radius-pill: 9999px;
+
+  /* === MOTION === */
+  --ease-fast:   80ms ease;
+  --ease-normal: 120ms ease;
+  --ease-enter:  200ms cubic-bezier(0.0, 0.0, 0.2, 1);
+  --ease-exit:   150ms cubic-bezier(0.4, 0.0, 1, 1);
+  --ease-spring: 400ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}

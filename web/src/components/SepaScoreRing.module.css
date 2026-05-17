@@ -1,0 +1,35 @@
+.ring {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.track {
+  stroke: var(--bg-elevated);
+  fill: none;
+}
+.fill {
+  fill: none;
+  stroke-linecap: round;
+  transform: rotate(-90deg);
+  transform-origin: center;
+}
+.value {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -60%);
+  font: 700 18px/1 var(--font-data);
+  letter-spacing: -0.5px;
+}
+.label {
+  position: absolute;
+  bottom: 4px;
+  left: 50%;
+  transform: translateX(-50%);
+  font: 500 9px/1 var(--font-ui);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-tertiary);
+}

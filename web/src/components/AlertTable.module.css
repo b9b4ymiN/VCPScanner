@@ -1,0 +1,48 @@
+.wrapper {
+  flex: 1;
+  overflow-y: auto;
+}
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-ui);
+}
+.table thead th {
+  padding: 0 var(--space-4);
+  height: 36px;
+  font: 500 11px var(--font-ui);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  text-align: right;
+  border-bottom: 0.5px solid var(--bg-border);
+  user-select: none;
+  cursor: pointer;
+  white-space: nowrap;
+  position: sticky;
+  top: 0;
+  background: var(--bg-surface);
+  z-index: 10;
+}
+.table thead th:hover {
+  color: var(--text-secondary);
+}
+.thLeft {
+  text-align: left;
+}
+.thCenter {
+  text-align: center;
+}
+.thRight {
+  text-align: right;
+}
+.sortArrows {
+  font-size: 10px;
+  color: var(--text-tertiary);
+  margin-left: 2px;
+}
+.sortActive {
+  font-size: 10px;
+  color: var(--orange-400);
+  margin-left: 2px;
+}

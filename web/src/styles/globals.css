@@ -1,0 +1,114 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: var(--font-ui);
+  background: var(--bg-canvas);
+  color: var(--text-primary);
+  overflow: hidden;
+  height: 100vh;
+}
+
+#root {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--bg-active);
+  border-radius: var(--radius-pill);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-tertiary);
+}
+
+/* Selection */
+::selection {
+  background: rgba(245, 105, 0, 0.25);
+  color: var(--text-primary);
+}
+
+/* Skeleton animation */
+@keyframes shimmer {
+  0%   { background-position: -400px 0; }
+  100% { background-position:  400px 0; }
+}
+
+.skeleton {
+  background: linear-gradient(90deg,
+    var(--bg-elevated) 25%,
+    var(--bg-hover) 50%,
+    var(--bg-elevated) 75%
+  );
+  background-size: 800px 100%;
+  animation: shimmer 1.4s infinite linear;
+  border-radius: var(--radius-sm);
+}
+
+/* HIGH alert pulse */
+@keyframes alert-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(245,105,0,0.6); }
+  50%       { box-shadow: 0 0 0 4px rgba(245,105,0,0); }
+}
+
+/* Toast */
+@keyframes toast-in {
+  from { transform: translateY(8px); opacity: 0; }
+  to   { transform: translateY(0);   opacity: 1; }
+}
+
+/* Accessibility — Focus rings */
+*:focus-visible {
+  outline: 2px solid var(--orange-400);
+  outline-offset: 2px;
+}
+
+/* Responsive breakpoints (DESIGN.md Section 9) */
+@media (max-width: 1280px) {
+  .sidebar {
+    width: 60px;
+  }
+  .sidebar .nav-label {
+    display: none;
+  }
+}
+
+@media (max-width: 1024px) {
+  .col-name {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .body-layout {
+    flex-direction: column;
+  }
+  .sidebar {
+    width: 100%;
+    height: 52px;
+    flex-direction: row;
+  }
+  .col-vcp,
+  .col-pivot {
+    display: none;
+  }
+}

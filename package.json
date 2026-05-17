@@ -1,0 +1,54 @@
+{
+  "name": "vcp-scanner",
+  "module": "index.ts",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "bun run --watch server/index.ts",
+    "scan": "bun run scripts/manual-scan.ts",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "validate": "bun run scripts/validate.ts",
+    "check": "biome check . && bun run typecheck && bun run test && bun run validate",
+    "build": "bun run build:server && bun run build:web",
+    "build:server": "bun build server/index.ts --outdir dist --target bun",
+    "build:web": "cd web && bun run build",
+    "typecheck": "bun run typecheck:server && bun run typecheck:web",
+    "typecheck:server": "tsc --noEmit --project tsconfig.json",
+    "typecheck:web": "cd web && tsc --noEmit",
+    "generate": "drizzle-kit generate",
+    "migrate": "drizzle-kit migrate",
+    "seed": "bun run scripts/seed-symbols.ts",
+    "lint": "biome check .",
+    "lint:fix": "biome check --write .",
+    "format": "biome format --write ."
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.4.15",
+    "@tanstack/react-query": "^5.100.10",
+    "@tanstack/react-router": "^1.170.1",
+    "@tanstack/react-table": "^8.21.3",
+    "@tanstack/react-virtual": "^3.13.24",
+    "@types/bun": "latest",
+    "@vitejs/plugin-react": "^6.0.2",
+    "better-sqlite3": "^12.10.0",
+    "drizzle-kit": "^0.31.10",
+    "lightweight-charts": "^5.2.0",
+    "react": "^19.2.6",
+    "react-dom": "^19.2.6",
+    "vite": "^8.0.13",
+    "vitest": "^4.1.6",
+    "zustand": "^5.0.13"
+  },
+  "peerDependencies": {
+    "typescript": "^6.0.3"
+  },
+  "dependencies": {
+    "@ixjb94/indicators": "^1.2.4",
+    "cron-parser": "^5.5.0",
+    "drizzle-orm": "^0.45.2",
+    "hono": "^4.12.19",
+    "yahoo-finance2": "^3.14.1",
+    "zod": "^4.4.3"
+  }
+}

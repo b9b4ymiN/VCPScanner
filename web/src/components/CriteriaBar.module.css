@@ -1,0 +1,36 @@
+.row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-1) 0;
+}
+.label {
+  width: 120px;
+  font: 400 12px/1 var(--font-ui);
+  color: var(--text-secondary);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.track {
+  flex: 1;
+  height: 4px;
+  background: var(--bg-elevated);
+  border-radius: var(--radius-pill);
+  overflow: hidden;
+}
+.fill {
+  height: 100%;
+  border-radius: var(--radius-pill);
+  background: var(--orange-500);
+  transition: width 400ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+.max {
+  background: var(--purple-400);
+}
+.score {
+  width: 44px;
+  text-align: right;
+  font: 500 11px/1 var(--font-data);
+  color: var(--text-secondary);
+  flex-shrink: 0;
+}

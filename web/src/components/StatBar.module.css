@@ -1,0 +1,68 @@
+.bar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--bg-border);
+  background: var(--bg-surface);
+  height: 52px;
+  flex-shrink: 0;
+}
+.item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+.count {
+  font: 700 14px/1 var(--font-data);
+  color: var(--text-primary);
+}
+.label {
+  font: 500 11px/1 var(--font-ui);
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+.dotHigh {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--alert-high);
+  box-shadow: 0 0 6px rgba(245,105,0,0.6);
+  animation: alert-pulse 2s ease infinite;
+}
+.dotMedium {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--alert-medium);
+}
+.dotWatch {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--alert-watch);
+}
+.total {
+  margin-left: auto;
+  font: 400 12px/1 var(--font-ui);
+  color: var(--text-secondary);
+}
+.total strong {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+.market {
+  margin-left: var(--space-4);
+  padding-left: var(--space-4);
+  border-left: 1px solid var(--bg-border);
+  font: 500 12px/1 var(--font-ui);
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+.marketArrow {
+  color: var(--green-400);
+  font-size: 10px;
+}

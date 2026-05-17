@@ -1,0 +1,53 @@
+.row {
+  height: 48px;
+  border-bottom: 0.5px solid var(--bg-border);
+  cursor: pointer;
+  transition: background var(--ease-fast);
+}
+.row:hover {
+  background: var(--bg-hover);
+}
+.selected {
+  background: var(--bg-active);
+}
+.cellLeft {
+  text-align: left;
+  padding: 0 var(--space-4);
+  font-size: 13px;
+  white-space: nowrap;
+}
+.cellCenter {
+  text-align: center;
+  padding: 0 var(--space-4);
+  font-size: 13px;
+  white-space: nowrap;
+}
+.cellNum {
+  text-align: right;
+  padding: 0 var(--space-4);
+  font-family: var(--font-data);
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+.symbolCol {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.symbol {
+  font: 600 14px/1 var(--font-ui);
+  color: var(--text-primary);
+}
+.name {
+  font: 400 11px/1 var(--font-ui);
+  color: var(--text-secondary);
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.arrow {
+  color: var(--text-tertiary);
+  font-size: 12px;
+}
