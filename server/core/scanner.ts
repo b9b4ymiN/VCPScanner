@@ -2,7 +2,7 @@ import { db } from '../db/client'
 import { alerts, scanRuns } from '../db/schema'
 import { eq } from 'drizzle-orm'
 import type { Market, Strategy, DataProvider, PriceData, StrategyResult, Fundamentals, TechnicalIndicators, AlertTags, AlertSetup, StockProfile, TradePlan } from './types'
-import { calcRSI, calcADX, calcATR, calcBollingerWidth, calc52WeekHigh, calcBreakoutStatus, calcVolumeRatio } from '../indicators/technicals'
+import { calcRSI, calcADX, calcATR, calcBollingerWidth, calc52WeekHigh, calcBreakoutStatus, calcPivotBreakoutDate, calcVolumeRatio } from '../indicators/technicals'
 
 export interface ScanOptions {
   market: Market
@@ -218,6 +218,7 @@ async function saveAlert(
 
     // Enriched — Layer 1
     breakoutStatus: breakout?.status ?? null,
+    breakoutDate: vcp.pivotPrice != null ? calcPivotBreakoutDate(recent, vcp.pivotPrice) : null,
     price52wHigh: breakout?.price52wHigh ?? null,
     revenueGrowthYoy: fundamentals.revenueGrowthYoY,
     epsGrowthYoy: fundamentals.epsGrowthYoY,

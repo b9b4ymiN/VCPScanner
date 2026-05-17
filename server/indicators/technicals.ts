@@ -156,6 +156,16 @@ export function calcBreakoutStatus(prices: PriceData[]): { status: BreakoutStatu
   return { status, price52wHigh: result.high52w, positionPct }
 }
 
+// Pivot breakout date: most recent date where close crossed above pivotPrice
+export function calcPivotBreakoutDate(prices: PriceData[], pivotPrice: number): string | null {
+  for (let i = prices.length - 1; i >= 1; i--) {
+    if (prices[i]!.close > pivotPrice && prices[i - 1]!.close <= pivotPrice) {
+      return prices[i]!.date
+    }
+  }
+  return null
+}
+
 // Volume ratio: recent 5-day avg vs 20-day avg
 export function calcVolumeRatio(volumes: number[]): number | null {
   if (volumes.length < 20) return null

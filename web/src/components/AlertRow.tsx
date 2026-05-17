@@ -1,5 +1,5 @@
 import type { Alert } from '../api/types'
-import { formatPrice, formatPct, formatScore, scoreColor, changeColor, pivotColor, breakoutColor, breakoutLabel, formatIndicator } from '../lib/format'
+import { formatPrice, formatPct, formatScore, scoreColor, changeColor, pivotColor, breakoutColor, breakoutLabel, formatIndicator, formatDate } from '../lib/format'
 import { Fire, Lightning, MapPin, CaretRight } from '@phosphor-icons/react'
 import { VcpBadge } from './VcpBadge'
 import styles from './AlertRow.module.css'
@@ -58,6 +58,9 @@ export function AlertRow({ alert, isSelected, onClick }: Props) {
         >
           {breakoutLabel(alert.breakoutStatus)}
         </span>
+        {alert.breakoutDate && (
+          <span className={styles.breakoutDate}>{formatDate(alert.breakoutDate)}</span>
+        )}
       </td>
       <td className={`${styles.cellNum} ${styles.colGrowth}`}>
         <div className={styles.growthCol}>

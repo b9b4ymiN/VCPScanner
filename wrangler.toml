@@ -1,0 +1,25 @@
+name = "vcp-scanner"
+main = "worker/src/index.ts"
+compatibility_date = "2024-12-01"
+compatibility_flags = ["nodejs_compat"]
+
+# ─── D1 Database ───
+[[d1_databases]]
+binding = "DB"
+database_name = "vcp-scanner-db"
+database_id = "1433627a-63cb-4b99-8d42-0a700f47d366"
+migrations_dir = "worker/drizzle"
+
+# ─── Queue for batch scanning ───
+[[queues.producers]]
+queue = "scan-batch"
+binding = "SCAN_QUEUE"
+
+[[queues.consumers]]
+queue = "scan-batch"
+max_batch_size = 5
+max_retries = 2
+
+# ─── Cron Trigger (16:30 Bangkok = 09:30 UTC, Mon-Fri) ───
+[triggers]
+crons = ["30 9 * * 1-5"]

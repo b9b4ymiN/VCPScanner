@@ -1,0 +1,1 @@
+ALTER TABLE `alerts` ADD `breakout_date` text;

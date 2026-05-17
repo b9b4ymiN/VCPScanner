@@ -39,6 +39,7 @@ export interface Alert {
 
   // Enriched — Layer 1
   breakoutStatus: BreakoutStatus | null
+  breakoutDate: string | null
   price52wHigh: number | null
   revenueGrowthYoy: number | null
   epsGrowthYoy: number | null

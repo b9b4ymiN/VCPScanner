@@ -43,7 +43,7 @@ export const alerts = sqliteTable('alerts', {
   vcpQuality: text('vcp_quality'),
   vcpQualityScore: integer('vcp_quality_score'),
   vcpContractions: text('vcp_contractions'),
-  vcpVolDrying: integer('vcp_vol_drying', { mode: 'boolean' }),
+  vcpVolDrying: integer('vol_drying', { mode: 'boolean' }),
   pivotPrice: real('pivot_price'),
   pivotDistancePct: real('pivot_distance_pct'),
 
@@ -55,7 +55,7 @@ export const alerts = sqliteTable('alerts', {
   scoreC6: real('score_c6'),
   scoreC7: real('score_c7'),
 
-  // Enriched data — Layer 1 (visible in table)
+  // Enriched data — Layer 1
   breakoutStatus: text('breakout_status'),
   breakoutDate: text('breakout_date'),
   price52wHigh: real('price_52w_high'),
@@ -63,7 +63,7 @@ export const alerts = sqliteTable('alerts', {
   epsGrowthYoy: real('eps_growth_yoy'),
   volumeRatio: real('volume_ratio'),
 
-  // Enriched data — Layer 2 (detail panel)
+  // Enriched data — Layer 2
   rsi14: real('rsi_14'),
   adx14: real('adx_14'),
   bbWidthPct: real('bb_width_pct'),
