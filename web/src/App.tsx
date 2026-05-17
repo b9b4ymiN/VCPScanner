@@ -9,17 +9,20 @@ import { ConfigView } from './components/ConfigView'
 import { ToastContainer } from './components/Toast'
 import { useAlerts, useStatus } from './api/hooks'
 import { useUiStore } from './stores/ui'
+import { formatDate } from './lib/format'
 import styles from './App.module.css'
 
 export function App() {
   const {
     selectedSymbol,
+    selectedDate,
     levelFilter,
     minScore,
     searchQuery,
     sidebarTab,
     sidebarOpen,
     setSelectedSymbol,
+    clearSelectedDate,
     setLevelFilter,
     setMinScore,
     setSearchQuery,
@@ -28,6 +31,7 @@ export function App() {
   } = useUiStore()
 
   const { data: alertsData, isLoading } = useAlerts({
+    date: selectedDate ?? undefined,
     level: levelFilter ?? undefined,
     minScore,
   })
@@ -42,6 +46,14 @@ export function App() {
     return a.symbol.toUpperCase().includes(q) || (a.name?.toUpperCase().includes(q) ?? false)
   })
 
+  const handleTabChange = (tab: 'alerts' | 'history' | 'config') => {
+    if (tab === 'alerts') {
+      clearSelectedDate()
+      setSelectedSymbol(null)
+    }
+    setSidebarTab(tab)
+  }
+
   const lastScan = status?.lastScan?.finishedAt
     ? new Date(status.lastScan.finishedAt).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' })
     : null
@@ -52,7 +64,7 @@ export function App() {
       <div className={styles.body}>
         <Sidebar
           active={sidebarTab}
-          onTabChange={setSidebarTab}
+          onTabChange={handleTabChange}
           lastScan={lastScan}
           isRunning={status?.scheduler.isRunning}
           open={sidebarOpen}
@@ -62,6 +74,12 @@ export function App() {
           {sidebarTab === 'alerts' && (
             <>
               <StatBar alerts={filteredAlerts} marketSummary={alertsData?.marketSummary} />
+              {selectedDate && (
+                <div className={styles.dateBanner}>
+                  <span className={styles.dateLabel}>Alerts for {formatDate(selectedDate)}</span>
+                  <button className={styles.dateClear} onClick={() => { clearSelectedDate(); setSelectedSymbol(null) }}>✕ Back to latest</button>
+                </div>
+              )}
               <FilterBar
                 levelFilter={levelFilter}
                 onLevelChange={setLevelFilter}

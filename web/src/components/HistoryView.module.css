@@ -40,9 +40,11 @@
 .row {
   height: 48px;
   border-bottom: 0.5px solid var(--bg-border);
+  cursor: pointer;
+  transition: background 120ms ease;
 }
 .row:hover {
-  background: var(--bg-hover);
+  background: rgba(245, 105, 0, 0.06);
 }
 .cellLeft {
   text-align: left;

@@ -22,6 +22,34 @@
   gap: 2px;
   padding: var(--space-4);
 }
+.dateBanner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-2) var(--space-4);
+  background: rgba(245, 105, 0, 0.08);
+  border-bottom: 0.5px solid rgba(245, 105, 0, 0.2);
+  flex-shrink: 0;
+}
+.dateLabel {
+  font: 500 12px/1 var(--font-ui);
+  color: var(--orange-400);
+  letter-spacing: -0.2px;
+}
+.dateClear {
+  font: 500 11px/1 var(--font-ui);
+  color: var(--text-tertiary);
+  background: none;
+  border: 0.5px solid var(--bg-border);
+  border-radius: var(--radius-sm);
+  padding: 3px 8px;
+  cursor: pointer;
+  transition: all 120ms ease;
+}
+.dateClear:hover {
+  color: var(--text-primary);
+  border-color: var(--text-secondary);
+}
 
 @media (max-width: 768px) {
   .body {

@@ -1,10 +1,18 @@
 import { useHistory } from '../api/hooks'
 import { formatDate, formatScore } from '../lib/format'
+import { useUiStore } from '../stores/ui'
 import { EmptyState } from './EmptyState'
 import styles from './HistoryView.module.css'
 
 export function HistoryView() {
   const { data, isLoading } = useHistory(30)
+  const { setSelectedDate, setSidebarTab, setSelectedSymbol } = useUiStore()
+
+  const handleRowClick = (date: string) => {
+    setSelectedSymbol(null)
+    setSelectedDate(date)
+    setSidebarTab('alerts')
+  }
 
   if (isLoading) {
     return (
@@ -41,7 +49,7 @@ export function HistoryView() {
           </thead>
           <tbody>
             {entries.map((e) => (
-              <tr key={e.date} className={styles.row}>
+              <tr key={e.date} className={styles.row} role="button" tabIndex={0} onClick={() => handleRowClick(e.date)} onKeyDown={(ev) => { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); handleRowClick(e.date) } }}>
                 <td className={styles.cellLeft}>{formatDate(e.date)}</td>
                 <td className={styles.cellNum}>{e.totalAlerts}</td>
                 <td className={styles.cellNum} style={{ color: 'var(--alert-high)' }}>{e.highCount}</td>

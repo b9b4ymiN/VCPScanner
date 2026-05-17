@@ -3,6 +3,7 @@ import type { AlertLevel } from '../api/types'
 
 interface UiState {
   selectedSymbol: string | null
+  selectedDate: string | null
   levelFilter: AlertLevel | null
   minScore: number
   searchQuery: string
@@ -10,6 +11,8 @@ interface UiState {
   sidebarOpen: boolean
 
   setSelectedSymbol: (symbol: string | null) => void
+  setSelectedDate: (date: string | null) => void
+  clearSelectedDate: () => void
   setLevelFilter: (level: AlertLevel | null) => void
   setMinScore: (score: number) => void
   setSearchQuery: (q: string) => void
@@ -19,6 +22,7 @@ interface UiState {
 
 export const useUiStore = create<UiState>((set) => ({
   selectedSymbol: null,
+  selectedDate: null,
   levelFilter: null,
   minScore: 60,
   searchQuery: '',
@@ -26,6 +30,8 @@ export const useUiStore = create<UiState>((set) => ({
   sidebarOpen: false,
 
   setSelectedSymbol: (symbol) => set({ selectedSymbol: symbol }),
+  setSelectedDate: (date) => set({ selectedDate: date }),
+  clearSelectedDate: () => set({ selectedDate: null }),
   setLevelFilter: (level) => set({ levelFilter: level }),
   setMinScore: (score) => set({ minScore: score }),
   setSearchQuery: (q) => set({ searchQuery: q }),
