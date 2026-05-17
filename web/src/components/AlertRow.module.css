@@ -7,6 +7,11 @@
 .row:hover {
   background: var(--bg-hover);
 }
+.row:focus-visible {
+  outline: 2px solid var(--orange-400);
+  outline-offset: -2px;
+  background: var(--bg-hover);
+}
 .selected {
   background: var(--bg-active);
 }
@@ -47,7 +52,37 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+.breakoutBadge {
+  font: 600 9px/1 var(--font-data);
+  letter-spacing: 0.5px;
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-elevated);
+}
+.growthCol {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  font-size: 10px;
+  line-height: 1.2;
+  font-family: var(--font-data);
+}
 .arrow {
   color: var(--text-tertiary);
   font-size: 12px;
+}
+
+@media (max-width: 1024px) {
+  .name {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .growthCol,
+  .breakoutBadge,
+  .colVcp,
+  .colPivot {
+    display: none;
+  }
 }

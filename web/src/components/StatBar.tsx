@@ -1,11 +1,19 @@
 import type { Alert } from '../api/types'
+import { formatIndicator } from '../lib/format'
 import styles from './StatBar.module.css'
+
+interface MarketSummary {
+  totalScanned: number
+  totalPassed: number
+  marketScoreC7: number | null
+}
 
 interface Props {
   alerts: Alert[]
+  marketSummary?: MarketSummary | null
 }
 
-export function StatBar({ alerts }: Props) {
+export function StatBar({ alerts, marketSummary }: Props) {
   const high = alerts.filter(a => a.alertLevel === 'HIGH').length
   const medium = alerts.filter(a => a.alertLevel === 'MEDIUM').length
   const watch = alerts.filter(a => a.alertLevel === 'WATCH').length
@@ -30,8 +38,19 @@ export function StatBar({ alerts }: Props) {
       <div className={styles.total}>
         Total: <strong>{alerts.length}</strong>
       </div>
+      {marketSummary && (
+        <div className={styles.scanInfo}>
+          <span className={styles.scanLabel}>Scanned</span>
+          <span className={styles.scanValue}>{marketSummary.totalScanned}</span>
+          <span className={styles.scanLabel}>Passed</span>
+          <span className={styles.scanValue}>{marketSummary.totalPassed}</span>
+        </div>
+      )}
       <div className={styles.market}>
         SET <span className={styles.marketArrow}>▲</span>
+        {marketSummary?.marketScoreC7 != null && (
+          <span className={styles.marketScore}>C7: {formatIndicator(marketSummary.marketScoreC7)}</span>
+        )}
       </div>
     </div>
   )

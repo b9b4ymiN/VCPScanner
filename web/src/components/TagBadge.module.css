@@ -1,0 +1,25 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  font: 600 9px/1 var(--font-data);
+  letter-spacing: 0.3px;
+  padding: 3px 8px;
+  border-radius: var(--radius-pill);
+  white-space: nowrap;
+}
+.green {
+  color: var(--green-400);
+  background: var(--green-dim);
+}
+.purple {
+  color: var(--purple-400);
+  background: var(--purple-dim);
+}
+.blue {
+  color: var(--blue-400);
+  background: var(--blue-dim);
+}
+.yellow {
+  color: var(--yellow-400);
+  background: var(--yellow-dim);
+}

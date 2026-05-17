@@ -45,11 +45,13 @@ export class YahooProvider implements DataProvider {
 
     try {
       const info = await yf.quoteSummary(ysymbol, {
-        modules: ['financialData', 'defaultKeyStatistics'],
-      }) as Record<string, Record<string, number | undefined>>
+        modules: ['financialData', 'defaultKeyStatistics', 'summaryProfile', 'summaryDetail'],
+      }) as Record<string, Record<string, unknown>>
 
-      const fd = info.financialData ?? {}
-      const ks = info.defaultKeyStatistics ?? {}
+      const fd = (info.financialData ?? {}) as Record<string, unknown>
+      const ks = (info.defaultKeyStatistics ?? {}) as Record<string, unknown>
+      const sp = (info.summaryProfile ?? {}) as Record<string, unknown>
+      const sd = (info.summaryDetail ?? {}) as Record<string, unknown>
 
       return {
         epsGrowthYoY: ks.earningsQuarterlyGrowth != null
@@ -70,7 +72,21 @@ export class YahooProvider implements DataProvider {
         insiderHold: ks.heldPercentInsiders != null
           ? Number(ks.heldPercentInsiders)
           : null,
-        sector: null,
+        sector: sp.sector != null ? String(sp.sector) : null,
+        longName: sp.longName != null ? String(sp.longName) : null,
+        industry: sp.industry != null ? String(sp.industry) : null,
+        dividendYield: sd.dividendYield != null
+          ? Number(sd.dividendYield)
+          : null,
+        recommendationKey: fd.recommendationKey != null
+          ? String(fd.recommendationKey)
+          : null,
+        fiftyTwoWeekHigh: sd.fiftyTwoWeekHigh != null
+          ? Number(sd.fiftyTwoWeekHigh)
+          : null,
+        fiftyTwoWeekLow: sd.fiftyTwoWeekLow != null
+          ? Number(sd.fiftyTwoWeekLow)
+          : null,
       }
     } catch {
       return {
@@ -81,6 +97,12 @@ export class YahooProvider implements DataProvider {
         institutionalHold: null,
         insiderHold: null,
         sector: null,
+        longName: null,
+        industry: null,
+        dividendYield: null,
+        recommendationKey: null,
+        fiftyTwoWeekHigh: null,
+        fiftyTwoWeekLow: null,
       }
     }
   }

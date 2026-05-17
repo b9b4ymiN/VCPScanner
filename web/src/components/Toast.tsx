@@ -1,4 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
+import { CheckCircle, WarningCircle, Info } from '@phosphor-icons/react'
+import styles from './Toast.module.css'
 
 interface Toast {
   id: number
@@ -32,33 +34,18 @@ export function ToastContainer() {
   if (toasts.length === 0) return null
 
   return (
-    <div style={{
-      position: 'fixed',
-      bottom: 24,
-      right: 24,
-      zIndex: 9999,
-      display: 'flex',
-      flexDirection: 'column',
-      gap: 8,
-    }}>
+    <div className={styles.container} role="status">
       {toasts.map(t => (
         <div
           key={t.id}
-          style={{
-            padding: '12px 16px',
-            background: 'var(--bg-elevated)',
-            border: '0.5px solid var(--bg-border)',
-            borderRadius: 'var(--radius-lg)',
-            font: '400 13px var(--font-ui)',
-            color: 'var(--text-primary)',
-            boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
-            animation: 'toast-in 200ms ease forwards',
-            maxWidth: 320,
-            borderLeft: t.type === 'success' ? '2px solid var(--green-400)' :
-                        t.type === 'error' ? '2px solid var(--red-400)' :
-                        '2px solid var(--orange-500)',
-          }}
+          className={`${styles.toast} ${styles[`toast${t.type.charAt(0).toUpperCase() + t.type.slice(1)}` as keyof typeof styles]}`}
+          aria-live="polite"
         >
+          <span className={styles.icon}>
+            {t.type === 'success' ? <CheckCircle size={16} weight="fill" color="var(--green-400)" /> :
+             t.type === 'error' ? <WarningCircle size={16} weight="fill" color="var(--red-400)" /> :
+             <Info size={16} weight="fill" color="var(--orange-500)" />}
+          </span>
           {t.message}
         </div>
       ))}

@@ -1,3 +1,4 @@
+import { Bell, ClockCounterClockwise, Gear, X } from '@phosphor-icons/react'
 import styles from './Sidebar.module.css'
 
 type Tab = 'alerts' | 'history' | 'config'
@@ -7,37 +8,51 @@ interface Props {
   onTabChange: (tab: Tab) => void
   lastScan?: string | null
   isRunning?: boolean
+  open?: boolean
+  onClose?: () => void
 }
 
-export function Sidebar({ active, onTabChange, lastScan, isRunning }: Props) {
+export function Sidebar({ active, onTabChange, lastScan, isRunning, open, onClose }: Props) {
   return (
-    <aside className={styles.sidebar}>
-      <nav className={styles.nav}>
-        <button
-          className={`${styles.tab} ${active === 'alerts' ? styles.active : ''}`}
-          onClick={() => onTabChange('alerts')}
-        >
-          Alerts
-        </button>
-        <button
-          className={`${styles.tab} ${active === 'history' ? styles.active : ''}`}
-          onClick={() => onTabChange('history')}
-        >
-          History
-        </button>
-        <button
-          className={`${styles.tab} ${active === 'config' ? styles.active : ''}`}
-          onClick={() => onTabChange('config')}
-        >
-          Config
-        </button>
-      </nav>
-      <div className={styles.meta}>
-        <div className={styles.metaLabel}>Last scan</div>
-        <div className={styles.metaValue}>
-          {isRunning ? 'Running...' : lastScan ?? '—'}
+    <>
+      {open && <div className={styles.backdrop} onClick={onClose} />}
+      <aside className={`${styles.sidebar} ${open ? styles.open : ''}`}>
+        <div className={styles.mobileHeader}>
+          <span className={styles.mobileTitle}>Menu</span>
+          <button className={styles.closeBtn} onClick={onClose} aria-label="Close menu">
+            <X size={20} />
+          </button>
         </div>
-      </div>
-    </aside>
+        <nav className={styles.nav}>
+          <button
+            className={`${styles.tab} ${active === 'alerts' ? styles.active : ''}`}
+            onClick={() => onTabChange('alerts')}
+          >
+            <Bell size={18} />
+            <span className={styles.navLabel}>Alerts</span>
+          </button>
+          <button
+            className={`${styles.tab} ${active === 'history' ? styles.active : ''}`}
+            onClick={() => onTabChange('history')}
+          >
+            <ClockCounterClockwise size={18} />
+            <span className={styles.navLabel}>History</span>
+          </button>
+          <button
+            className={`${styles.tab} ${active === 'config' ? styles.active : ''}`}
+            onClick={() => onTabChange('config')}
+          >
+            <Gear size={18} />
+            <span className={styles.navLabel}>Config</span>
+          </button>
+        </nav>
+        <div className={styles.meta}>
+          <div className={styles.metaLabel}>Last scan</div>
+          <div className={styles.metaValue}>
+            {isRunning ? 'Running...' : lastScan ?? '—'}
+          </div>
+        </div>
+      </aside>
+    </>
   )
 }

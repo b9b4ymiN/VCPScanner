@@ -82,33 +82,3 @@ body {
   outline-offset: 2px;
 }
 
-/* Responsive breakpoints (DESIGN.md Section 9) */
-@media (max-width: 1280px) {
-  .sidebar {
-    width: 60px;
-  }
-  .sidebar .nav-label {
-    display: none;
-  }
-}
-
-@media (max-width: 1024px) {
-  .col-name {
-    display: none;
-  }
-}
-
-@media (max-width: 768px) {
-  .body-layout {
-    flex-direction: column;
-  }
-  .sidebar {
-    width: 100%;
-    height: 52px;
-    flex-direction: row;
-  }
-  .col-vcp,
-  .col-pivot {
-    display: none;
-  }
-}

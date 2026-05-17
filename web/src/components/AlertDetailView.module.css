@@ -1,5 +1,5 @@
 .panel {
-  width: 400px;
+  width: 560px;
   flex-shrink: 0;
   border-left: 1px solid var(--bg-border);
   background: var(--bg-surface);
@@ -8,6 +8,8 @@
   overflow-y: auto;
   height: 100%;
 }
+
+/* ── Header ── */
 .header {
   display: flex;
   align-items: center;
@@ -34,6 +36,7 @@
   flex-direction: column;
   gap: 1px;
   flex: 1;
+  min-width: 0;
 }
 .symbol {
   font: 600 15px/1 var(--font-ui);
@@ -42,6 +45,13 @@
 .name {
   font: 400 11px/1 var(--font-ui);
   color: var(--text-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.sector {
+  font: 400 10px/1 var(--font-ui);
+  color: var(--text-tertiary);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -59,6 +69,18 @@
 .change {
   font: 500 12px/1 var(--font-data);
 }
+
+/* ── Tags ── */
+.tagsRow {
+  display: flex;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  border-bottom: 1px solid var(--bg-border);
+  flex-shrink: 0;
+  flex-wrap: wrap;
+}
+
+/* ── Body ── */
 .body {
   padding: var(--space-4);
   display: flex;
@@ -67,16 +89,11 @@
 }
 .chartSection {
   display: flex;
-  align-items: center;
-  gap: var(--space-6);
+  flex-direction: column;
+  gap: var(--space-3);
 }
-.chartArea {
-  flex: 1;
-  background: var(--bg-elevated);
-  border-radius: var(--radius-md);
-  padding: var(--space-3);
+.scoreRow {
   display: flex;
-  align-items: center;
   justify-content: center;
 }
 .noChart {
@@ -86,17 +103,21 @@
   display: flex;
   align-items: center;
 }
+
+/* ── Sections ── */
 .section {
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
 }
 .sectionTitle {
-  font: 600 13px/1 var(--font-ui);
-  color: var(--text-secondary);
+  font: 600 11px/1 var(--font-ui);
+  color: var(--text-tertiary);
   text-transform: uppercase;
-  letter-spacing: 0.3px;
+  letter-spacing: 0.5px;
 }
+
+/* ── VCP ── */
 .vcpChartWrap {
   background: var(--bg-elevated);
   border-radius: var(--radius-md);
@@ -118,6 +139,8 @@
   font: 500 12px/1.6 var(--font-data);
   color: var(--text-primary);
 }
+
+/* ── Criteria ── */
 .criteria {
   display: flex;
   flex-direction: column;
@@ -133,4 +156,78 @@
   font-family: var(--font-data);
   font-weight: 700;
   color: var(--text-primary);
+}
+
+/* ── Data Grid (Fundamentals / Technicals / Setup) ── */
+.dataGrid {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--space-1) var(--space-4);
+}
+.dataLabel {
+  font: 400 12px/1.6 var(--font-ui);
+  color: var(--text-tertiary);
+}
+.dataValue {
+  font: 500 12px/1.6 var(--font-data);
+  color: var(--text-primary);
+  text-align: right;
+}
+
+/* ── Trade Plan ── */
+.tradeGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: var(--space-2);
+}
+.tradeCard {
+  background: var(--bg-elevated);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  border: 1px solid transparent;
+}
+.stopCard {
+  border-color: rgba(239, 68, 68, 0.2);
+}
+.targetCard {
+  border-color: rgba(34, 197, 94, 0.2);
+}
+.tradeLabel {
+  font: 500 10px/1 var(--font-ui);
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+.tradeValue {
+  font: 600 14px/1 var(--font-data);
+  color: var(--text-primary);
+}
+.tradeMeta {
+  display: flex;
+  gap: var(--space-4);
+  font: 400 12px/1 var(--font-ui);
+  color: var(--text-secondary);
+}
+.tradeMeta strong {
+  font-family: var(--font-data);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* ── Responsive ── */
+@media (max-width: 1279px) {
+  .panel {
+    width: 450px;
+  }
+}
+@media (max-width: 767px) {
+  .panel {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    z-index: 100;
+  }
 }

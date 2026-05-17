@@ -3,7 +3,7 @@ import { Sidebar } from './components/Sidebar'
 import { StatBar } from './components/StatBar'
 import { FilterBar } from './components/FilterBar'
 import { AlertTable } from './components/AlertTable'
-import { DetailPanel } from './components/DetailPanel'
+import { AlertDetailView } from './components/AlertDetailView'
 import { HistoryView } from './components/HistoryView'
 import { ConfigView } from './components/ConfigView'
 import { ToastContainer } from './components/Toast'
@@ -18,11 +18,13 @@ export function App() {
     minScore,
     searchQuery,
     sidebarTab,
+    sidebarOpen,
     setSelectedSymbol,
     setLevelFilter,
     setMinScore,
     setSearchQuery,
     setSidebarTab,
+    setSidebarOpen,
   } = useUiStore()
 
   const { data: alertsData, isLoading } = useAlerts({
@@ -53,11 +55,13 @@ export function App() {
           onTabChange={setSidebarTab}
           lastScan={lastScan}
           isRunning={status?.scheduler.isRunning}
+          open={sidebarOpen}
+          onClose={() => setSidebarOpen(false)}
         />
         <main className={styles.main}>
           {sidebarTab === 'alerts' && (
             <>
-              <StatBar alerts={filteredAlerts} />
+              <StatBar alerts={filteredAlerts} marketSummary={alertsData?.marketSummary} />
               <FilterBar
                 levelFilter={levelFilter}
                 onLevelChange={setLevelFilter}
@@ -87,7 +91,7 @@ export function App() {
           {sidebarTab === 'config' && <ConfigView />}
         </main>
         {selectedAlert && sidebarTab === 'alerts' && (
-          <DetailPanel alert={selectedAlert} onClose={() => setSelectedSymbol(null)} />
+          <AlertDetailView alert={selectedAlert} onClose={() => setSelectedSymbol(null)} />
         )}
       </div>
       <ToastContainer />

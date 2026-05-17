@@ -21,6 +21,12 @@ export interface Fundamentals {
   institutionalHold: number | null
   insiderHold: number | null
   sector: string | null
+  longName: string | null
+  industry: string | null
+  dividendYield: number | null
+  recommendationKey: string | null
+  fiftyTwoWeekHigh: number | null
+  fiftyTwoWeekLow: number | null
 }
 
 // ─── Market ───
@@ -110,6 +116,47 @@ export interface Strategy {
     marketIndex: PriceData[]
     sectorPeers?: Map<string, PriceData[]>
   }): StrategyResult
+}
+
+// ─── Enriched Alert Data ───
+
+export interface TechnicalIndicators {
+  rsi14: number | null
+  adx14: number | null
+  bbWidth: number | null
+  bbPercentB: number | null
+  atr14: number | null
+  high52w: number | null
+  distance52w: number | null
+}
+
+export interface AlertTags {
+  turnaround: boolean
+  blueSky: boolean
+  analystBuy: boolean
+  highDividend: boolean
+}
+
+export interface AlertSetup {
+  vcpPatternLabel: string
+  proximity52wPct: number | null
+  breakoutStatus: 'BLUE_SKY' | 'READY' | 'PENDING' | 'FAR'
+}
+
+export interface StockProfile {
+  longName: string | null
+  sector: string | null
+  industry: string | null
+  dividendYield: number | null
+  recommendationKey: string | null
+}
+
+export interface TradePlan {
+  entryPrice: number
+  stopPrice: number
+  targetPrice: number
+  riskPct: number
+  rewardRiskRatio: number
 }
 
 // ─── Result type (no throw in business logic) ───

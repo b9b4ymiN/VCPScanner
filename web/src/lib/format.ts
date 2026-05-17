@@ -41,3 +41,28 @@ export function pivotColor(pct: number | null): string {
   if (pct < 0.05) return 'var(--yellow-400)'
   return 'var(--text-secondary)'
 }
+
+export function breakoutColor(status: string | null): string {
+  switch (status) {
+    case 'BLUE_SKY': return 'var(--purple-400)'
+    case 'READY': return 'var(--green-400)'
+    case 'PENDING': return 'var(--yellow-400)'
+    case 'FAR': return 'var(--text-tertiary)'
+    default: return 'var(--text-tertiary)'
+  }
+}
+
+export function breakoutLabel(status: string | null): string {
+  switch (status) {
+    case 'BLUE_SKY': return 'BLUE SKY'
+    case 'READY': return 'READY'
+    case 'PENDING': return 'PENDING'
+    case 'FAR': return 'FAR'
+    default: return '—'
+  }
+}
+
+export function formatIndicator(val: number | null, fallback: string = '—'): string {
+  if (val === null) return fallback
+  return val.toFixed(1)
+}

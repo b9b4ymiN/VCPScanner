@@ -55,6 +55,23 @@ export const alerts = sqliteTable('alerts', {
   scoreC6: real('score_c6'),
   scoreC7: real('score_c7'),
 
+  // Enriched data — Layer 1 (visible in table)
+  breakoutStatus: text('breakout_status'),
+  price52wHigh: real('price_52w_high'),
+  revenueGrowthYoy: real('revenue_growth_yoy'),
+  epsGrowthYoy: real('eps_growth_yoy'),
+  volumeRatio: real('volume_ratio'),
+
+  // Enriched data — Layer 2 (detail panel)
+  rsi14: real('rsi_14'),
+  adx14: real('adx_14'),
+  bbWidthPct: real('bb_width_pct'),
+  entryPrice: real('entry_price'),
+  stopPrice: real('stop_price'),
+  targetPrice: real('target_price'),
+  riskRewardRatio: real('risk_reward_ratio'),
+  riskPct: real('risk_pct'),
+
   prices60d: text('prices_60d'),
   volumes60d: text('volumes_60d'),
   details: text('details'),

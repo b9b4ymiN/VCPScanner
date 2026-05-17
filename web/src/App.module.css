@@ -22,3 +22,9 @@
   gap: 2px;
   padding: var(--space-4);
 }
+
+@media (max-width: 768px) {
+  .body {
+    width: 100%;
+  }
+}

@@ -1,7 +1,8 @@
 import { db } from '../db/client'
 import { alerts, scanRuns } from '../db/schema'
 import { eq } from 'drizzle-orm'
-import type { Market, Strategy, DataProvider, PriceData, StrategyResult } from './types'
+import type { Market, Strategy, DataProvider, PriceData, StrategyResult, Fundamentals, TechnicalIndicators, AlertTags, AlertSetup, StockProfile, TradePlan } from './types'
+import { calcRSI, calcADX, calcATR, calcBollingerWidth, calc52WeekHigh, calcBreakoutStatus, calcVolumeRatio } from '../indicators/technicals'
 
 export interface ScanOptions {
   market: Market
@@ -103,7 +104,7 @@ async function scanSymbol(
           / prices[prices.length - 2]!.close) * 100
       : null
 
-    await saveAlert(result, market.id, strategy.id, prices, fundamentals.sector, priceChangePct)
+    await saveAlert(result, market.id, strategy.id, prices, fundamentals, priceChangePct)
     return true
   } catch (err) {
     console.error(`[scanner] ${symbol}: ${err}`)
@@ -116,19 +117,87 @@ async function saveAlert(
   marketId: string,
   strategyId: string,
   prices: PriceData[],
-  sector: string | null,
+  fundamentals: Fundamentals,
   priceChangePct: number | null,
 ): Promise<void> {
   const vcp = result.details.vcp
   const sb = result.details.sepaBreakdown
   const recent = prices.slice(-60)
+  const closes = prices.map(p => p.close)
+
+  // Compute technical indicators
+  const rsi14 = calcRSI(closes)
+  const adx14 = calcADX(prices)
+  const atr14 = calcATR(prices)
+  const bb = calcBollingerWidth(closes)
+  const w52 = calc52WeekHigh(prices)
+  const breakout = calcBreakoutStatus(prices)
+  const volumeRatio = calcVolumeRatio(recent.map(p => p.volume))
+
+  const technicals: TechnicalIndicators = {
+    rsi14,
+    adx14,
+    bbWidth: bb?.bandwidth ?? null,
+    bbPercentB: bb?.percentB ?? null,
+    atr14,
+    high52w: w52?.high52w ?? null,
+    distance52w: w52?.distance ?? null,
+  }
+
+  // Compute trade plan
+  const currentPrice = result.details.price
+  let tradePlan: TradePlan | null = null
+  if (atr14 && atr14 > 0) {
+    const stopPrice = currentPrice - 2 * atr14
+    const targetPrice = currentPrice + 3 * atr14
+    const riskPct = ((currentPrice - stopPrice) / currentPrice) * 100
+    const rewardRiskRatio = (targetPrice - currentPrice) / (currentPrice - stopPrice)
+    tradePlan = { entryPrice: currentPrice, stopPrice, targetPrice, riskPct, rewardRiskRatio }
+  }
+
+  // Derive tags
+  const tags: AlertTags = {
+    turnaround: fundamentals.epsGrowthYoY != null && fundamentals.epsGrowthYoY > 0.5,
+    blueSky: breakout?.status === 'BLUE_SKY',
+    analystBuy: fundamentals.recommendationKey != null
+      && ['buy', 'strong_buy'].includes(fundamentals.recommendationKey),
+    highDividend: fundamentals.dividendYield != null && fundamentals.dividendYield > 0.03,
+  }
+
+  // Derive setup
+  const setup: AlertSetup = {
+    vcpPatternLabel: `${vcp.contractions.length}C ${vcp.qualityLabel}`,
+    proximity52wPct: w52?.distance ?? null,
+    breakoutStatus: breakout?.status ?? 'FAR',
+  }
+
+  // Profile
+  const profile: StockProfile = {
+    longName: fundamentals.longName,
+    sector: fundamentals.sector,
+    industry: fundamentals.industry,
+    dividendYield: fundamentals.dividendYield,
+    recommendationKey: fundamentals.recommendationKey,
+  }
+
+  // Enriched details (spread original + new fields)
+  const enrichedDetails = {
+    ...result.details,
+    technicals,
+    tradePlan,
+    tags,
+    setup,
+    profile,
+    volumeRatio,
+  }
 
   const values = {
     date: result.date,
     symbol: result.symbol,
     marketId,
     strategyId,
-    sector,
+    name: fundamentals.longName,
+    sector: fundamentals.sector,
     sepaScore: result.score,
     alertLevel: result.alertLevel!,
     price: result.details.price,
@@ -146,9 +215,30 @@ async function saveAlert(
     scoreC5: sb.c5Leadership,
     scoreC6: sb.c6Sponsorship,
     scoreC7: sb.c7Market,
-    prices60d: JSON.stringify(recent.map(p => p.close)),
-    volumes60d: JSON.stringify(recent.map(p => p.volume)),
-    details: JSON.stringify(result.details),
+
+    // Enriched — Layer 1
+    breakoutStatus: breakout?.status ?? null,
+    price52wHigh: breakout?.price52wHigh ?? null,
+    revenueGrowthYoy: fundamentals.revenueGrowthYoY,
+    epsGrowthYoy: fundamentals.epsGrowthYoY,
+    volumeRatio,
+
+    // Enriched — Layer 2
+    rsi14,
+    adx14,
+    bbWidthPct: bb?.bandwidth ?? null,
+    entryPrice: tradePlan?.entryPrice ?? null,
+    stopPrice: tradePlan?.stopPrice ?? null,
+    targetPrice: tradePlan?.targetPrice ?? null,
+    riskRewardRatio: tradePlan?.rewardRiskRatio ?? null,
+    riskPct: tradePlan?.riskPct ?? null,
+
+    prices60d: JSON.stringify(recent.map(p => ({
+      date: p.date, open: p.open, high: p.high,
+      low: p.low, close: p.close, volume: p.volume,
+    }))),
+    volumes60d: null,
+    details: JSON.stringify(enrichedDetails),
   }
 
   await db.insert(alerts).values(values).onConflictDoUpdate({

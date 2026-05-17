@@ -12,7 +12,13 @@
 .left {
   display: flex;
   align-items: center;
-  gap: var(--space-4);
+  gap: var(--space-3);
+}
+.mark {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-md);
+  box-shadow: 0 0 0 1px var(--bg-border);
 }
 .logo {
   font: 700 16px/1 var(--font-ui);
@@ -27,4 +33,26 @@
 .version {
   font: 400 11px/1 var(--font-data);
   color: var(--text-tertiary);
+}
+.hamburger {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  border-radius: var(--radius-md);
+}
+.hamburger:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+@media (max-width: 768px) {
+  .hamburger {
+    display: flex;
+  }
 }

@@ -1,7 +1,7 @@
 import { Hono } from 'hono'
 import { db } from '../db/client'
-import { alerts } from '../db/schema'
-import { eq, gte, desc, and, count, sql } from 'drizzle-orm'
+import { alerts, scanRuns } from '../db/schema'
+import { eq, gte, desc, and, count } from 'drizzle-orm'
 
 const app = new Hono()
 
@@ -26,16 +26,39 @@ app.get('/', async (c) => {
       )
     : and(eq(alerts.date, date), gte(alerts.sepaScore, minScore))
 
-  const [rows, countResult] = await Promise.all([
+  const [rows, countResult, marketSummary] = await Promise.all([
     db.select().from(alerts)
       .where(conditions)
       .orderBy(desc(alerts.sepaScore))
       .limit(limit)
       .offset(offset),
     db.select({ total: count() }).from(alerts).where(conditions),
+    db.select({
+      totalScanned: scanRuns.totalScanned,
+      totalPassed: scanRuns.totalPassed,
+    }).from(scanRuns)
+      .where(eq(scanRuns.status, 'success'))
+      .orderBy(desc(scanRuns.id))
+      .limit(1),
   ])
 
-  return c.json({ date, total: countResult[0]?.total ?? 0, alerts: rows })
+  const marketScoreC7 = rows.length > 0 ? rows[0]!.scoreC7 : null
+
+  return c.json({
+    date,
+    total: countResult[0]?.total ?? 0,
+    alerts: rows.map(r => ({
+      ...r,
+      prices60d: r.prices60d ? JSON.parse(r.prices60d as string) : null,
+      volumes60d: r.volumes60d ? JSON.parse(r.volumes60d as string) : null,
+      details: r.details ? JSON.parse(r.details as string) : null,
+    })),
+    marketSummary: {
+      totalScanned: marketSummary[0]?.totalScanned ?? 0,
+      totalPassed: marketSummary[0]?.totalPassed ?? 0,
+      marketScoreC7,
+    },
+  })
 })
 
 export default app
