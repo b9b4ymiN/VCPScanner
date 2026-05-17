@@ -105,6 +105,15 @@ export const scanRuns = sqliteTable('scan_runs', {
   errorMsg: text('error_msg'),
 })
 
+// ─── Page Views ───
+
+export const pageViews = sqliteTable('page_views', {
+  date: text('date').notNull(),
+  count: integer('count').notNull().default(0),
+}, t => ({
+  pk: primaryKey({ columns: [t.date] }),
+}))
+
 // ─── Price Cache ───
 
 export const priceCache = sqliteTable('price_cache', {

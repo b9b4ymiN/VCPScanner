@@ -47,3 +47,11 @@ export function fetchStatus(): Promise<StatusResponse> {
 export function triggerScan(): Promise<{ status: string; message: string }> {
   return fetch(`${BASE}/scan/trigger`, { method: 'POST' }).then(r => r.json())
 }
+
+export function fetchViews(): Promise<import('./types').ViewsResponse> {
+  return fetchJson<import('./types').ViewsResponse>(`${BASE}/views`)
+}
+
+export function trackView(): Promise<import('./types').ViewsResponse> {
+  return fetch(`${BASE}/views`, { method: 'POST' }).then(r => r.json())
+}

@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { fetchAlerts, fetchHistory, fetchStatus, fetchStockDetail, triggerScan } from './client'
+import { fetchAlerts, fetchHistory, fetchStatus, fetchStockDetail, fetchViews, trackView, triggerScan } from './client'
 
 export function useAlerts(params: {
   date?: string
@@ -46,6 +46,24 @@ export function useTriggerScan() {
         qc.invalidateQueries({ queryKey: ['alerts'] })
         qc.invalidateQueries({ queryKey: ['status'] })
       }, 2000)
+    },
+  })
+}
+
+export function useViews() {
+  return useQuery({
+    queryKey: ['views'],
+    queryFn: fetchViews,
+    refetchInterval: 60_000,
+  })
+}
+
+export function useTrackView() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: trackView,
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['views'] })
     },
   })
 }

@@ -1,7 +1,7 @@
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
 import { getDb } from './db'
-import { alerts, scanRuns, symbols } from './schema'
+import { alerts, scanRuns, symbols, pageViews } from './schema'
 import { eq, gte, desc, and, count, sql } from 'drizzle-orm'
 import { YahooFetchProvider } from './providers/yahoo'
 import type { Market, PriceData, PricePeriod, Fundamentals } from '../../server/core/types'
@@ -151,6 +151,27 @@ app.get('/api/history', async (c) => {
     .limit(days)
 
   return c.json({ days, history: rows })
+})
+
+// ─── Page Views ───
+
+app.get('/api/views', async (c) => {
+  const db = getDb(c.env.DB)
+  const today = new Date().toISOString().slice(0, 10)
+  const [todayRow, totalRow] = await Promise.all([
+    db.select({ count: pageViews.count }).from(pageViews).where(eq(pageViews.date, today)),
+    db.select({ total: sql<number>`coalesce(sum(${pageViews.count}), 0)` }).from(pageViews),
+  ])
+  return c.json({ total: totalRow[0]?.total ?? 0, today: todayRow[0]?.count ?? 0, todayDate: today })
+})
+
+app.post('/api/views', async (c) => {
+  const db = getDb(c.env.DB)
+  const today = new Date().toISOString().slice(0, 10)
+  await db.insert(pageViews).values({ date: today, count: 1 })
+    .onConflictDoUpdate({ target: pageViews.date, set: { count: sql`${pageViews.count} + 1` } })
+  const [totalRow] = await db.select({ total: sql<number>`coalesce(sum(${pageViews.count}), 0)` }).from(pageViews)
+  return c.json({ total: totalRow?.total ?? 0, todayDate: today })
 })
 
 // ─── Trigger Scan ───

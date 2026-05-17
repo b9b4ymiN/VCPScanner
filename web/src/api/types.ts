@@ -108,4 +108,10 @@ export interface StatusResponse {
   timestamp: string
 }
 
+export interface ViewsResponse {
+  total: number
+  today: number
+  todayDate: string
+}
+
 export interface StockDetail extends Alert {}
