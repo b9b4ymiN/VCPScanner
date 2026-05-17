@@ -48,6 +48,19 @@ export function AlertRow({ alert, isSelected, onClick }: Props) {
       <td className={styles.cellNum} style={{ color: scoreColor(alert.sepaScore) }}>
         {formatScore(alert.sepaScore)}
       </td>
+      <td className={`${styles.cellCenter} ${styles.colTt}`}>
+        {alert.trendTemplateScore !== null ? (
+          <span
+            className={`${styles.ttBadge} ${
+              alert.trendTemplateScore >= 7 ? styles.ttGood :
+              alert.trendTemplateScore >= 5 ? styles.ttOk :
+              styles.ttWeak
+            }`}
+          >
+            TT {alert.trendTemplateScore}/8
+          </span>
+        ) : '—'}
+      </td>
       <td className={`${styles.cellCenter} ${styles.colVcp}`}>
         <VcpBadge quality={alert.vcpQuality} contractions={contractionCount} />
       </td>

@@ -17,6 +17,7 @@ interface Details {
   technicals?: { rsi14?: number | null; adx14?: number | null; bbWidth?: number | null; atr14?: number | null; high52w?: number | null; distance52w?: number | null }
   tradePlan?: { entryPrice?: number; stopPrice?: number; targetPrice?: number; riskPct?: number; rewardRiskRatio?: number } | null
   vcp?: { swingHighs?: [number, number][]; swingLows?: [number, number][]; pivotPrice?: number }
+  trendTemplate?: { score: number; conditions: boolean[]; labels: string[]; rsPercentile: number | null }
 }
 
 interface Props {
@@ -143,6 +144,26 @@ export function AlertDetailView({ alert, onClose }: Props) {
             Total: <strong>{formatScore(alert.sepaScore)}</strong>/100
           </div>
         </div>
+
+        {/* Trend Template */}
+        {d.trendTemplate && (() => {
+          const tt = d.trendTemplate
+          return (
+            <div className={styles.section}>
+              <h4 className={styles.sectionTitle}>Trend Template — {tt.score}/8</h4>
+              <div className={styles.ttChecklist}>
+                {tt.labels.map((label, i) => (
+                  <div key={i} className={styles.ttItem}>
+                    <span className={tt.conditions[i] ? styles.ttPass : styles.ttFail}>
+                      {tt.conditions[i] ? '✓' : '✗'}
+                    </span>
+                    <span className={styles.ttLabel}>{label}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )
+        })()}
 
         {/* Fundamentals */}
         <div className={styles.section}>

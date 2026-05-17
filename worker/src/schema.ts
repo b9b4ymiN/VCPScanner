@@ -54,6 +54,7 @@ export const alerts = sqliteTable('alerts', {
   scoreC5: real('score_c5'),
   scoreC6: real('score_c6'),
   scoreC7: real('score_c7'),
+  trendTemplateScore: integer('trend_template_score'),
 
   // Enriched data — Layer 1
   breakoutStatus: text('breakout_status'),
@@ -86,6 +87,7 @@ export const alerts = sqliteTable('alerts', {
   idxSymbol: index('idx_symbol').on(t.symbol),
   idxLevel: index('idx_level').on(t.alertLevel),
   idxScore: index('idx_score').on(t.sepaScore),
+  idxTtScore: index('idx_tt_score').on(t.trendTemplateScore),
 }))
 
 // ─── Scan Runs ───

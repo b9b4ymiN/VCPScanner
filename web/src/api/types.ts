@@ -36,6 +36,7 @@ export interface Alert {
   scoreC5: number | null
   scoreC6: number | null
   scoreC7: number | null
+  trendTemplateScore: number | null
 
   // Enriched — Layer 1
   breakoutStatus: BreakoutStatus | null

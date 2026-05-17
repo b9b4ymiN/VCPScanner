@@ -7,6 +7,7 @@ import { mean } from '../indicators/stats'
 import { detectVcp } from './_shared/vcp-detector'
 import { scoreAllCriteria } from './_shared/sepa-criteria'
 import { classifyAlert } from './_shared/alert-level'
+import { evaluateTrendTemplate, type TrendTemplateResult } from './_shared/trend-template'
 
 function reject(symbol: string, date: string): StrategyResult {
   return {
@@ -27,6 +28,7 @@ function reject(symbol: string, date: string): StrategyResult {
       },
       price: 0,
       avgVol20d: 0,
+      trendTemplate: null as TrendTemplateResult | null,
     },
   }
 }
@@ -74,6 +76,9 @@ export const VcpMinerviniStrategy: Strategy = {
       sepaBreakdown.c6Sponsorship +
       sepaBreakdown.c7Market
 
+    // ── Trend Template (Mark Minervini 8-point checklist) ──
+    const trendTemplate = evaluateTrendTemplate(prices, fundamentals, marketIndex)
+
     // ── Alert Trigger (BLUEPRINT Section 1.4) ──
     const passes = sepaScore >= 60 && vcp.isVcp
     if (!passes) {
@@ -83,7 +88,7 @@ export const VcpMinerviniStrategy: Strategy = {
         passes: false,
         score: sepaScore,
         alertLevel: null,
-        details: { sepaBreakdown, vcp, price: currentPrice, avgVol20d },
+        details: { sepaBreakdown, vcp, price: currentPrice, avgVol20d, trendTemplate },
       }
     }
 
@@ -99,7 +104,7 @@ export const VcpMinerviniStrategy: Strategy = {
       passes: true,
       score: sepaScore,
       alertLevel,
-      details: { sepaBreakdown, vcp, price: currentPrice, avgVol20d },
+      details: { sepaBreakdown, vcp, price: currentPrice, avgVol20d, trendTemplate },
     }
   },
 }

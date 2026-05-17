@@ -6,6 +6,8 @@ interface Props {
   onLevelChange: (level: AlertLevel | null) => void
   minScore: number
   onMinScoreChange: (score: number) => void
+  ttFilter: number | null
+  onTtChange: (filter: number | null) => void
   searchQuery: string
   onSearchChange: (q: string) => void
 }
@@ -15,6 +17,8 @@ export function FilterBar({
   onLevelChange,
   minScore,
   onMinScoreChange,
+  ttFilter,
+  onTtChange,
   searchQuery,
   onSearchChange,
 }: Props) {
@@ -23,6 +27,13 @@ export function FilterBar({
     { value: 'HIGH', label: 'HIGH' },
     { value: 'MEDIUM', label: 'MED' },
     { value: 'WATCH', label: 'WATCH' },
+  ]
+
+  const ttFilters: { value: number | null; label: string }[] = [
+    { value: null, label: 'ALL' },
+    { value: 8, label: '8/8' },
+    { value: 6, label: '6+' },
+    { value: 4, label: '4+' },
   ]
 
   return (
@@ -35,6 +46,16 @@ export function FilterBar({
             onClick={() => onLevelChange(l.value)}
           >
             {l.label}
+          </button>
+        ))}
+        <div className={styles.separator} />
+        {ttFilters.map(t => (
+          <button
+            key={t.label}
+            className={`${styles.chip} ${ttFilter === t.value ? styles.active : ''}`}
+            onClick={() => onTtChange(t.value)}
+          >
+            TT {t.label}
           </button>
         ))}
       </div>

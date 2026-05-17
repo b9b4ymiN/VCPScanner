@@ -158,6 +158,34 @@
   color: var(--text-primary);
 }
 
+/* ── Trend Template ── */
+.ttChecklist {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.ttItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.ttPass {
+  color: var(--green-400);
+  font-size: 13px;
+  width: 16px;
+  text-align: center;
+}
+.ttFail {
+  color: var(--red-400);
+  font-size: 13px;
+  width: 16px;
+  text-align: center;
+}
+.ttLabel {
+  font: 400 12px/1.4 var(--font-ui);
+  color: var(--text-secondary);
+}
+
 /* ── Data Grid (Fundamentals / Technicals / Setup) ── */
 .dataGrid {
   display: grid;

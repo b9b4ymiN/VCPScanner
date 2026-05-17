@@ -77,6 +77,25 @@
   color: var(--text-tertiary);
   font-size: 12px;
 }
+.ttBadge {
+  font: 600 10px/1 var(--font-data);
+  padding: 1px 6px;
+  border-radius: var(--radius-round);
+  display: inline-block;
+  white-space: nowrap;
+}
+.ttGood {
+  color: var(--green-400);
+  background: rgba(74, 222, 128, 0.1);
+}
+.ttOk {
+  color: var(--orange-400);
+  background: rgba(251, 146, 60, 0.1);
+}
+.ttWeak {
+  color: var(--text-tertiary);
+  background: rgba(148, 163, 184, 0.1);
+}
 
 @media (max-width: 1024px) {
   .name {

@@ -18,6 +18,7 @@ export function App() {
     selectedDate,
     levelFilter,
     minScore,
+    ttFilter,
     searchQuery,
     sidebarTab,
     sidebarOpen,
@@ -25,6 +26,7 @@ export function App() {
     clearSelectedDate,
     setLevelFilter,
     setMinScore,
+    setTtFilter,
     setSearchQuery,
     setSidebarTab,
     setSidebarOpen,
@@ -34,6 +36,7 @@ export function App() {
     date: selectedDate ?? undefined,
     level: levelFilter ?? undefined,
     minScore,
+    ttMin: ttFilter ?? undefined,
   })
 
   const { data: status } = useStatus()
@@ -85,6 +88,8 @@ export function App() {
                 onLevelChange={setLevelFilter}
                 minScore={minScore}
                 onMinScoreChange={setMinScore}
+                ttFilter={ttFilter}
+                onTtChange={setTtFilter}
                 searchQuery={searchQuery}
                 onSearchChange={setSearchQuery}
               />

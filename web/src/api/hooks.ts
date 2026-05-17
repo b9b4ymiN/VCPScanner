@@ -5,6 +5,7 @@ export function useAlerts(params: {
   date?: string
   level?: string
   minScore?: number
+  ttMin?: number
   offset?: number
 }) {
   return useQuery({

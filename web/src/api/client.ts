@@ -13,6 +13,7 @@ export function fetchAlerts(params: {
   date?: string
   level?: string
   minScore?: number
+  ttMin?: number
   limit?: number
   offset?: number
 }): Promise<AlertsResponse> {
@@ -20,6 +21,7 @@ export function fetchAlerts(params: {
   if (params.date) sp.set('date', params.date)
   if (params.level) sp.set('level', params.level)
   if (params.minScore !== undefined) sp.set('min_score', String(params.minScore))
+  if (params.ttMin !== undefined) sp.set('tt_min', String(params.ttMin))
   if (params.limit !== undefined) sp.set('limit', String(params.limit))
   if (params.offset !== undefined) sp.set('offset', String(params.offset))
   return fetchJson<AlertsResponse>(`${BASE}/alerts?${sp}`)

@@ -6,6 +6,7 @@ import { eq, gte, desc, and, count, sql } from 'drizzle-orm'
 import { YahooFetchProvider } from './providers/yahoo'
 import type { Market, PriceData, PricePeriod, Fundamentals } from '../../server/core/types'
 import { VcpMinerviniStrategy } from '../../server/strategies/vcp-minervini'
+import { evaluateTrendTemplate } from '../../server/strategies/_shared/trend-template'
 import {
   calcRSI, calcADX, calcATR, calcBollingerWidth, calc52WeekHigh,
   calcBreakoutStatus, calcPivotBreakoutDate, calcVolumeRatio,
@@ -72,10 +73,15 @@ app.get('/api/alerts', async (c) => {
   const minScore = Number(c.req.query('min_score') ?? 60)
   const limit = Math.min(Number(c.req.query('limit') ?? 100), 500)
   const offset = Number(c.req.query('offset') ?? 0)
+  const ttMin = c.req.query('tt_min')
 
-  const conditions = level
+  let conditions = level
     ? and(eq(alerts.date, date), gte(alerts.sepaScore, minScore), eq(alerts.alertLevel, level.toUpperCase()))
     : and(eq(alerts.date, date), gte(alerts.sepaScore, minScore))
+
+  if (ttMin) {
+    conditions = and(conditions, gte(alerts.trendTemplateScore, Number(ttMin)))
+  }
 
   const [rows, countResult, marketSummary] = await Promise.all([
     db.select().from(alerts).where(conditions).orderBy(desc(alerts.sepaScore)).limit(limit).offset(offset),
@@ -218,6 +224,9 @@ async function processBatch(env: Bindings, msg: ScanMessage): Promise<{ scanned:
 
       const result = strategy.scan({ symbol, market, prices, fundamentals, marketIndex })
 
+      // ── Trend Template Evaluation ──
+      const trendTemplate = evaluateTrendTemplate(prices, fundamentals, marketIndex)
+
       if (!result.passes || !result.alertLevel) continue
       passed++
 
@@ -281,12 +290,14 @@ async function processBatch(env: Bindings, msg: ScanMessage): Promise<{ scanned:
         rsi14, adx14,
         bbWidthPct: bb?.bandwidth ?? null,
         entryPrice, stopPrice, targetPrice, riskRewardRatio, riskPct,
+        trendTemplateScore: trendTemplate.score,
         prices60d: JSON.stringify(recent.map(p => ({
           date: p.date, open: p.open, high: p.high, low: p.low, close: p.close, volume: p.volume,
         }))),
         volumes60d: null,
         details: JSON.stringify({
           ...result.details,
+          trendTemplate,
           technicals: { rsi14, adx14, bbWidth: bb?.bandwidth ?? null, bbPercentB: bb?.percentB ?? null, atr14, high52w: w52?.high52w ?? null, distance52w: w52?.distance ?? null },
           tradePlan: atr14 ? { entryPrice, stopPrice, targetPrice, riskPct, rewardRiskRatio: riskRewardRatio } : null,
           tags: {

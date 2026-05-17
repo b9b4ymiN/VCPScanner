@@ -17,14 +17,19 @@ app.get('/', async (c) => {
   const minScore = Number(c.req.query('min_score') ?? 60)
   const limit = Math.min(Number(c.req.query('limit') ?? 100), 500)
   const offset = Number(c.req.query('offset') ?? 0)
+  const ttMin = c.req.query('tt_min')
 
-  const conditions = level
+  let conditions = level
     ? and(
         eq(alerts.date, date),
         gte(alerts.sepaScore, minScore),
         eq(alerts.alertLevel, level.toUpperCase()),
       )
     : and(eq(alerts.date, date), gte(alerts.sepaScore, minScore))
+
+  if (ttMin) {
+    conditions = and(conditions, gte(alerts.trendTemplateScore, Number(ttMin)))
+  }
 
   const [rows, countResult, marketSummary] = await Promise.all([
     db.select().from(alerts)
