@@ -80,7 +80,7 @@ app.get('/api/alerts', async (c) => {
     : and(eq(alerts.date, date), gte(alerts.sepaScore, minScore))
 
   if (ttMin) {
-    conditions = and(conditions, gte(alerts.trendTemplateScore, Number(ttMin)))
+    conditions = and(conditions, sql`(coalesce(${alerts.trendTemplateScore}, 0) >= ${Number(ttMin)})`)
   }
 
   const [rows, countResult, marketSummary] = await Promise.all([

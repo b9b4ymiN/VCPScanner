@@ -1,7 +1,7 @@
 import { Hono } from 'hono'
 import { db } from '../db/client'
 import { alerts, scanRuns } from '../db/schema'
-import { eq, gte, desc, and, count } from 'drizzle-orm'
+import { eq, gte, desc, and, count, sql } from 'drizzle-orm'
 
 const app = new Hono()
 
@@ -28,7 +28,7 @@ app.get('/', async (c) => {
     : and(eq(alerts.date, date), gte(alerts.sepaScore, minScore))
 
   if (ttMin) {
-    conditions = and(conditions, gte(alerts.trendTemplateScore, Number(ttMin)))
+    conditions = and(conditions, sql`(coalesce(${alerts.trendTemplateScore}, 0) >= ${Number(ttMin)})`)
   }
 
   const [rows, countResult, marketSummary] = await Promise.all([
