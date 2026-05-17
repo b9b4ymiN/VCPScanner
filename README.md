@@ -63,7 +63,7 @@ cd web && bun install && cd ..
 # Run database migrations
 bun run migrate
 
-# Seed SET symbols (148 stocks)
+# Seed SET symbols (867 stocks from set_universe.json)
 bun run seed
 
 # Start development (server + frontend)
