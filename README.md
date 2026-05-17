@@ -1,13 +1,13 @@
 # VCP Scanner
 
-Real-time stock scanner that identifies **Volatility Contraction Patterns (VCP)** and scores equities using the **SEPA (Specific Entry Point Analysis)** methodology — inspired by Mark Minervini's *Trade Like a Stock Market Wizard*.
+Stock scanner for the Stock Exchange of Thailand (SET) using **Volatility Contraction Pattern (VCP)** and **SEPA (Specific Entry Point Analysis)** methodology based on Mark Minervini's framework.
 
-Built with TypeScript end-to-end. No Python dependency.
+**Live**: [vcp-scanner.pages.dev](https://vcp-scanner.pages.dev)
 
-![Bun](https://img.shields.io/badge/runtime-Bun-000?logo=bun&logoColor=white)
+![Cloudflare Workers](https://img.shields.io/badge/deploy-Cloudflare-F38020?logo=cloudflare&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/lang-TypeScript_6-3178C6?logo=typescript&logoColor=white)
 ![React](https://img.shields.io/badge/ui-React_19-61DAFB?logo=react&logoColor=black)
-![License](https://img.shields.io/badge/license-MIT-green)
+![PWA](https://img.shields.io/badge/PWA-Installable-5A0FC8)
 
 ---
 
@@ -15,12 +15,14 @@ Built with TypeScript end-to-end. No Python dependency.
 
 - **7-Criteria SEPA Scoring** — Superperformance, Earnings, Catalyst, Supply/Demand, Leadership, Sponsorship, Market Timing (max 100 pts)
 - **VCP Detection** — Multi-contraction zigzag with quality classification (TIGHT / STANDARD / WIDE / LOOSE)
+- **Trend Template Filter** — Minervini 8-point trend template evaluation with filter buttons (ALL / 8/8 / 6+ / 4+)
+- **Pivot-based Trade Plan** — Entry zone (0-1% above pivot), stop loss (8% below pivot), 3:1 risk/reward target
+- **Technical Indicators** — RSI, ADX, Bollinger Bandwidth, 52-week high proximity, breakout status
 - **Alert Classification** — HIGH / MEDIUM / WATCH based on SEPA score + VCP quality
-- **Multi-Market Architecture** — 3-axis abstraction: `Market × Strategy × Provider` (SET, NASDAQ, NYSE, HKEX ready)
-- **Live Dashboard** — Dark pro-trader UI (blur.io aesthetic), real-time alert table, detail panel with sparklines, SEPA score ring, VCP contraction chart, and criteria breakdown
-- **Auto Scheduling** — EOD scan at 16:30 Bangkok time, Mon–Fri
-- **Yahoo Finance Integration** — Price history, fundamentals, market index via `yahoo-finance2`
-- **SQLite + Drizzle ORM** — Zero-config embedded database with type-safe queries
+- **Dark Pro-Trader UI** — Candlestick chart, SEPA score ring, VCP contraction chart, criteria breakdown
+- **PWA** — Installable with offline support via service worker
+- **Visitor Counter** — Daily/total page view tracking
+- **Auto Scheduling** — EOD scan at 16:30 Bangkok time, Mon–Fri via Cloudflare Cron
 
 ---
 
@@ -28,16 +30,15 @@ Built with TypeScript end-to-end. No Python dependency.
 
 | Layer | Technology |
 |---|---|
-| Runtime | [Bun](https://bun.sh) |
-| Server | [Hono](https://hono.dev) |
-| Database | SQLite via [Drizzle ORM](https://orm.drizzle.team) |
-| Frontend | React 19 + Vite |
+| Backend | [Cloudflare Workers](https://workers.cloudflare.com) + [Hono](https://hono.dev) |
+| Database | [Cloudflare D1](https://developers.cloudflare.com/d1/) via [Drizzle ORM](https://orm.drizzle.team) |
+| Queue | [Cloudflare Queue](https://developers.cloudflare.com/queues/) for batch scanning |
+| Frontend | React 19 + Vite (deployed on [Cloudflare Pages](https://pages.cloudflare.com)) |
 | Data Fetching | TanStack Query |
 | State | Zustand |
 | Styling | CSS Modules + CSS Variables (custom design system) |
-| Data Source | [yahoo-finance2](https://github.com/gadicc/yahoo-finance2) |
-| Validation | Zod |
-| Linting | Biome |
+| Data Source | Yahoo Finance via cookie/crumb auth |
+| PWA | vite-plugin-pwa (Workbox) |
 | Testing | Vitest |
 
 ---
@@ -47,39 +48,43 @@ Built with TypeScript end-to-end. No Python dependency.
 ### Prerequisites
 
 - [Bun](https://bun.sh) >= 1.3
-- TypeScript >= 6.0
+- [Wrangler CLI](https://developers.cloudflare.com/workers/wrangler/) for deployment
+- Cloudflare account with D1 + Queue + Pages enabled
 
-### Install & Run
+### Local Development
 
 ```bash
-# Clone the repository
 git clone https://github.com/your-username/vcpSystem.git
 cd vcpSystem
-
-# Install dependencies
 bun install
 cd web && bun install && cd ..
 
-# Run database migrations
-bun run migrate
+# Dev backend (Wrangler local)
+wrangler dev
 
-# Seed SET symbols (867 stocks from set_universe.json)
-bun run seed
-
-# Start development (server + frontend)
-bun run dev          # Backend on :8765
-cd web && bun run dev  # Frontend on :5173
+# Dev frontend (in another terminal)
+cd web && bun run dev
 ```
-
-Open **http://localhost:5173** in your browser.
 
 ### Trigger a Manual Scan
 
 ```bash
-curl -X POST http://localhost:8765/api/scan/trigger
+curl -X POST https://vcp-scanner.vcp-scanner.workers.dev/api/scan/trigger
 ```
 
 Or use the "Run Scan Now" button in the Config tab.
+
+### Deployment
+
+```bash
+# Deploy Worker
+wrangler deploy
+
+# Build and deploy frontend
+cd web
+VITE_API_URL=https://vcp-scanner.vcp-scanner.workers.dev bun run build
+wrangler pages deploy dist --project-name=vcp-scanner
+```
 
 ---
 
@@ -143,11 +148,13 @@ vcpSystem/
 
 | Method | Endpoint | Description |
 |---|---|---|
-| `GET` | `/api/alerts` | Today's alerts (query: `date`, `level`, `min_score`, `limit`, `offset`) |
+| `GET` | `/api/alerts` | Alerts (query: `date`, `level`, `min_score`, `tt_min`, `limit`, `offset`) |
 | `GET` | `/api/stock/:symbol` | Stock detail with prices + SEPA breakdown |
 | `GET` | `/api/history` | 30-day scan history |
-| `GET` | `/api/status` | Server status, scheduler state, last scan info |
-| `POST` | `/api/scan/trigger` | Trigger a manual scan (fire-and-forget) |
+| `GET` | `/api/status` | Server status, last scan info |
+| `GET` | `/api/views` | Daily/total page views |
+| `POST` | `/api/views` | Track page view |
+| `POST` | `/api/scan/trigger` | Trigger a manual scan (queues batch processing) |
 
 ### Example Response — Alerts
 
