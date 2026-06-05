@@ -1,4 +1,5 @@
 import { runScan, type ScanOptions } from './scanner'
+import { simulateEOD } from '../simulation'
 
 let isRunning = false
 
@@ -35,6 +36,7 @@ export async function triggerScan(options: ScanOptions): Promise<void> {
   isRunning = true
   try {
     await runScan(options)
+    await simulateEOD(new Date().toISOString().slice(0, 10))
   } catch {
     // already logged in scanner
   } finally {

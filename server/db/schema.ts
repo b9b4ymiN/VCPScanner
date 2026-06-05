@@ -120,3 +120,60 @@ export const priceCache = sqliteTable('price_cache', {
 }, t => ({
   pk: primaryKey({ columns: [t.symbol, t.marketId, t.date] }),
 }))
+
+// ─── Portfolio Simulation ───
+
+export const portfolios = sqliteTable('portfolios', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  name: text('name').notNull().default('VCP Sim'),
+  initialCap: real('initial_cap').notNull().default(100000),
+  cashBalance: real('cash_balance').notNull(),
+  totalValue: real('total_value').notNull(),
+  totalPnL: real('total_pnl').notNull().default(0),
+  totalPnLPct: real('total_pnl_pct').notNull().default(0),
+  status: text('status').notNull().default('active'),
+  createdAt: text('created_at').notNull(),
+  updatedAt: text('updated_at').notNull(),
+}, t => ({
+  idxStatus: index('idx_portfolios_status').on(t.status),
+}))
+
+export const positions = sqliteTable('positions', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  portfolioId: integer('portfolio_id').notNull().references(() => portfolios.id),
+  symbol: text('symbol').notNull(),
+  entryDate: text('entry_date').notNull(),
+  entryPrice: real('entry_price').notNull(),
+  stopPrice: real('stop_price').notNull(),
+  targetPrice: real('target_price').notNull(),
+  pivotPrice: real('pivot_price').notNull(),
+  quantity: integer('quantity').notNull(),
+  costBasis: real('cost_basis').notNull(),
+  exitDate: text('exit_date'),
+  exitPrice: real('exit_price'),
+  exitReason: text('exit_reason'),
+  pnl: real('pnl'),
+  pnlPct: real('pnl_pct'),
+  status: text('status').notNull().default('open'),
+  sepaScore: integer('sepa_score'),
+  vcpQuality: text('vcp_quality'),
+  createdAt: text('created_at').notNull(),
+}, t => ({
+  idxPortfolioStatus: index('idx_positions_portfolio_status').on(t.portfolioId, t.status),
+  idxPortfolioSymbolStatus: index('idx_positions_portfolio_symbol_status').on(t.portfolioId, t.symbol, t.status),
+}))
+
+export const dailySnapshots = sqliteTable('daily_snapshots', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  portfolioId: integer('portfolio_id').notNull().references(() => portfolios.id),
+  date: text('date').notNull(),
+  cashBalance: real('cash_balance').notNull(),
+  positionsValue: real('positions_value').notNull(),
+  totalValue: real('total_value').notNull(),
+  dailyPnL: real('daily_pnl').notNull(),
+  dailyPnLPct: real('daily_pnl_pct').notNull(),
+  openCount: integer('open_count').notNull(),
+  closedCount: integer('closed_count').notNull().default(0),
+}, t => ({
+  uniqPortfolioDate: uniqueIndex('idx_daily_snapshots_portfolio_date').on(t.portfolioId, t.date),
+}))

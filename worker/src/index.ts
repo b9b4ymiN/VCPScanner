@@ -35,6 +35,59 @@ type Bindings = {
 
 const app = new Hono<{ Bindings: Bindings }>()
 
+type PositionRow = typeof positions.$inferSelect
+
+async function latestPrice(db: ReturnType<typeof getDb>, symbol: string) {
+  const rows = await db.select({
+    price: alerts.price,
+    date: alerts.date,
+  }).from(alerts)
+    .where(eq(alerts.symbol, symbol))
+    .orderBy(desc(alerts.date))
+    .limit(1)
+
+  return rows[0] ?? null
+}
+
+function holdDays(entryDate: string, endDate?: string | null) {
+  const end = endDate ? new Date(endDate) : new Date()
+  return Math.max(0, Math.floor((end.getTime() - new Date(entryDate).getTime()) / 86400000))
+}
+
+async function enrichOpenPosition(db: ReturnType<typeof getDb>, pos: PositionRow) {
+  const latest = await latestPrice(db, pos.symbol)
+  const currentPrice = latest?.price ?? pos.entryPrice
+  const marketValue = currentPrice * pos.quantity
+  const unrealizedPnL = marketValue - pos.costBasis
+  const unrealizedPnLPct = pos.costBasis > 0 ? (unrealizedPnL / pos.costBasis) * 100 : 0
+
+  return {
+    ...pos,
+    currentPrice,
+    currentDate: latest?.date ?? null,
+    marketValue,
+    unrealizedPnL,
+    unrealizedPnLPct,
+    holdDays: holdDays(pos.entryDate),
+    priceSource: latest ? 'latest-alert' : 'entry-fallback',
+  }
+}
+
+function enrichClosedPosition(pos: PositionRow) {
+  const exitPrice = pos.exitPrice ?? pos.entryPrice
+  const marketValue = exitPrice * pos.quantity
+  const realizedPnL = pos.pnl ?? marketValue - pos.costBasis
+  const realizedPnLPct = pos.pnlPct ?? (pos.costBasis > 0 ? (realizedPnL / pos.costBasis) * 100 : 0)
+
+  return {
+    ...pos,
+    marketValue,
+    realizedPnL,
+    realizedPnLPct,
+    holdDays: holdDays(pos.entryDate, pos.exitDate),
+  }
+}
+
 // ─── Middleware ───
 
 app.use('*', cors({
@@ -199,7 +252,7 @@ app.post('/api/portfolio/init', async (c) => {
 app.get('/api/portfolio', async (c) => {
   const db = getDb(c.env.DB)
   const port = await db.select().from(portfolios).where(eq(portfolios.status, 'active')).limit(1)
-  if (!port.length) return c.json({ portfolio: null, positions: [], snapshot: null })
+  if (!port.length) return c.json({ portfolio: null, positions: [], snapshot: null, summary: null })
 
   const portId = port[0]!.id
   const [openPos, latestSnap] = await Promise.all([
@@ -207,7 +260,38 @@ app.get('/api/portfolio', async (c) => {
     db.select().from(dailySnapshots).where(eq(dailySnapshots.portfolioId, portId)).orderBy(desc(dailySnapshots.date)).limit(1),
   ])
 
-  return c.json({ portfolio: port[0], positions: openPos, snapshot: latestSnap[0] ?? null })
+  const enrichedPositions = await Promise.all(openPos.map(pos => enrichOpenPosition(db, pos)))
+  const positionsValue = enrichedPositions.reduce((sum, pos) => sum + pos.marketValue, 0)
+  const totalValue = port[0]!.cashBalance + positionsValue
+  const totalPnL = totalValue - port[0]!.initialCap
+  const totalPnLPct = port[0]!.initialCap > 0 ? (totalPnL / port[0]!.initialCap) * 100 : 0
+  const openUnrealizedPnL = enrichedPositions.reduce((sum, pos) => sum + pos.unrealizedPnL, 0)
+  const costBasis = enrichedPositions.reduce((sum, pos) => sum + pos.costBasis, 0)
+  const portfolio = { ...port[0]!, totalValue, totalPnL, totalPnLPct }
+
+  await db.update(portfolios).set({
+    totalValue,
+    totalPnL,
+    totalPnLPct,
+    updatedAt: new Date().toISOString(),
+  }).where(eq(portfolios.id, portId))
+
+  return c.json({
+    portfolio,
+    positions: enrichedPositions,
+    snapshot: latestSnap[0] ?? null,
+    summary: {
+      initialCap: port[0]!.initialCap,
+      cashBalance: port[0]!.cashBalance,
+      positionsValue,
+      totalValue,
+      totalPnL,
+      totalPnLPct,
+      openUnrealizedPnL,
+      costBasis,
+      openCount: enrichedPositions.length,
+    },
+  })
 })
 
 app.get('/api/portfolio/snapshots', async (c) => {
@@ -231,7 +315,7 @@ app.get('/api/portfolio/trades', async (c) => {
   const rows = await db.select().from(positions)
     .where(and(eq(positions.portfolioId, port[0]!.id), eq(positions.status, 'closed')))
     .orderBy(desc(positions.exitDate)).limit(limit)
-  return c.json({ trades: rows })
+  return c.json({ trades: rows.map(enrichClosedPosition) })
 })
 
 app.post('/api/portfolio/reset', async (c) => {

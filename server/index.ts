@@ -7,6 +7,7 @@ import { SCAN_OPTIONS } from './routes/scan'
 import alertsRoutes from './routes/alerts'
 import stockRoutes from './routes/stock'
 import historyRoutes from './routes/history'
+import portfolioRoutes from './routes/portfolio'
 import { scanRoutes } from './routes/scan'
 
 const app = new Hono()
@@ -23,6 +24,7 @@ app.use('*', cors({
 app.route('/api/alerts', alertsRoutes)
 app.route('/api/stock', stockRoutes)
 app.route('/api/history', historyRoutes)
+app.route('/api/portfolio', portfolioRoutes)
 app.route('/api/scan', scanRoutes)
 
 app.get('/api/status', async (c) => {
@@ -41,6 +43,16 @@ app.get('/api/status', async (c) => {
     lastScan: lastScan[0] ?? null,
     timestamp: new Date().toISOString(),
   })
+})
+
+app.get('/api/views', async (c) => {
+  const today = new Date().toISOString().slice(0, 10)
+  return c.json({ total: 0, today: 0, todayDate: today })
+})
+
+app.post('/api/views', async (c) => {
+  const today = new Date().toISOString().slice(0, 10)
+  return c.json({ total: 0, today: 0, todayDate: today })
 })
 
 // ─── Static files (frontend build) ───

@@ -151,6 +151,15 @@ export interface Position {
   sepaScore: number | null
   vcpQuality: string | null
   createdAt: string
+  currentPrice?: number
+  currentDate?: string | null
+  marketValue?: number
+  unrealizedPnL?: number
+  unrealizedPnLPct?: number
+  realizedPnL?: number
+  realizedPnLPct?: number
+  holdDays?: number
+  priceSource?: 'latest-alert' | 'entry-fallback'
 }
 
 export interface DailySnapshot {
@@ -170,6 +179,17 @@ export interface PortfolioResponse {
   portfolio: Portfolio | null
   positions: Position[]
   snapshot: DailySnapshot | null
+  summary: {
+    initialCap: number
+    cashBalance: number
+    positionsValue: number
+    totalValue: number
+    totalPnL: number
+    totalPnLPct: number
+    openUnrealizedPnL: number
+    costBasis: number
+    openCount: number
+  } | null
 }
 
 export interface SnapshotsResponse {
