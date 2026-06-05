@@ -34,21 +34,21 @@ export function AlertRow({ alert, isSelected, onClick }: Props) {
         }
       }}
     >
-      <td className={styles.cellCenter}>{alertIcon}</td>
-      <td className={styles.cellLeft}>
+      <td className={styles.cellCenter} data-label="Alert">{alertIcon}</td>
+      <td className={styles.cellLeft} data-label="Symbol">
         <div className={styles.symbolCol}>
           <span className={styles.symbol}>{alert.symbol}</span>
           {alert.name && <span className={styles.name}>{alert.name}</span>}
         </div>
       </td>
-      <td className={styles.cellNum}>{formatPrice(alert.price)}</td>
-      <td className={styles.cellNum} style={{ color: changeColor(alert.priceChangePct) }}>
+      <td className={styles.cellNum} data-label="Price">{formatPrice(alert.price)}</td>
+      <td className={styles.cellNum} data-label="Change" style={{ color: changeColor(alert.priceChangePct) }}>
         {alert.priceChangePct !== null ? formatPct(alert.priceChangePct) : '—'}
       </td>
-      <td className={styles.cellNum} style={{ color: scoreColor(alert.sepaScore) }}>
+      <td className={styles.cellNum} data-label="Score" style={{ color: scoreColor(alert.sepaScore) }}>
         {formatScore(alert.sepaScore)}
       </td>
-      <td className={`${styles.cellCenter} ${styles.colTt}`}>
+      <td className={`${styles.cellCenter} ${styles.colTt}`} data-label="Trend">
         {alert.trendTemplateScore !== null ? (
           <span
             className={`${styles.ttBadge} ${
@@ -61,10 +61,10 @@ export function AlertRow({ alert, isSelected, onClick }: Props) {
           </span>
         ) : '—'}
       </td>
-      <td className={`${styles.cellCenter} ${styles.colVcp}`}>
+      <td className={`${styles.cellCenter} ${styles.colVcp}`} data-label="VCP">
         <VcpBadge quality={alert.vcpQuality} contractions={contractionCount} />
       </td>
-      <td className={`${styles.cellCenter} ${styles.colBreakout}`}>
+      <td className={`${styles.cellCenter} ${styles.colBreakout}`} data-label="Breakout">
         <span
           className={styles.breakoutBadge}
           style={{ color: breakoutColor(alert.breakoutStatus) }}
@@ -75,7 +75,7 @@ export function AlertRow({ alert, isSelected, onClick }: Props) {
           <span className={styles.breakoutDate}>{formatDate(alert.breakoutDate)}</span>
         )}
       </td>
-      <td className={`${styles.cellNum} ${styles.colGrowth}`}>
+      <td className={`${styles.cellNum} ${styles.colGrowth}`} data-label="Growth">
         <div className={styles.growthCol}>
           {alert.epsGrowthYoy !== null && (
             <span style={{ color: alert.epsGrowthYoy >= 0 ? 'var(--green-400)' : 'var(--red-400)' }}>
@@ -90,13 +90,13 @@ export function AlertRow({ alert, isSelected, onClick }: Props) {
           {alert.epsGrowthYoy === null && alert.revenueGrowthYoy === null && '—'}
         </div>
       </td>
-      <td className={styles.cellNum}>
+      <td className={styles.cellNum} data-label="Volume">
         {alert.volumeRatio !== null ? formatIndicator(alert.volumeRatio) + 'x' : '—'}
       </td>
-      <td className={`${styles.cellNum} ${styles.colPivot}`} style={{ color: pivotColor(alert.pivotDistancePct) }}>
+      <td className={`${styles.cellNum} ${styles.colPivot}`} data-label="Pivot" style={{ color: pivotColor(alert.pivotDistancePct) }}>
         {alert.pivotDistancePct !== null ? formatPct(alert.pivotDistancePct) : '—'}
       </td>
-      <td className={styles.cellCenter}>
+      <td className={styles.cellCenter} data-label="Open">
         <span className={styles.arrow}><CaretRight size={14} color="var(--text-tertiary)" /></span>
       </td>
     </tr>

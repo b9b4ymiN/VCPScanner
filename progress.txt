@@ -1,0 +1,66 @@
+# Ralph Progress — VCP Scanner → Cloudflare Workers Migration
+
+## Started: 2026-05-17
+
+### Architecture Notes
+- Server already uses Hono (huge win — runs natively on Workers)
+- VCP strategy + indicators are pure computation (no runtime deps) → import directly
+- Yahoo Finance needs rewrite: yahoo-finance2 → raw fetch()
+- DB: bun:sqlite → D1 (Drizzle supports both)
+- Scheduler: setInterval → Cron Triggers + Queue for batch scanning
+- Frontend: Cloudflare Pages (no changes needed)
+
+### Key Constraints
+- Workers free plan: 10ms CPU time per request, 50 subrequests per invocation
+- Scanner needs batch processing via Queue (5 symbols/batch)
+- D1 free: 5GB storage, 5M reads/day, 100K writes/day
+- Queue free: 1M operations/month
+
+## Stories Completed
+
+### US-001: Worker project setup + D1 database ✅
+- wrangler.toml at project root with D1, Queue, Cron bindings
+- D1 database: vcp-scanner-db (1433627a-63cb-4b99-8d42-0a700f47d366)
+- Drizzle migrations in worker/drizzle/
+
+### US-002: D1 database client + schema ✅
+- worker/src/db.ts exports getDb(d1: D1Database)
+- worker/src/schema.ts matches server/db/schema.ts
+
+### US-003: Yahoo Finance fetch provider ✅
+- worker/src/providers/yahoo.ts uses raw fetch() (no yahoo-finance2)
+- 250ms rate limiting between requests
+
+### US-004: Hono API routes ✅
+- All routes: /api/status, /api/alerts, /api/stock/:symbol, /api/history, /api/scan/trigger
+- CORS configured, JSON.parse for stored JSON columns
+
+### US-005: Queue-based scanner + Cron ✅
+- Queue consumer processes 5 symbols per batch
+- Cron: "30 9 * * 1-5" (16:30 Bangkok, Mon-Fri)
+- Production: 894 SET symbols in 179 batches processed
+
+### US-006: Frontend deploy to Pages ✅
+- VITE_API_URL configurable in client.ts
+- Built and deployed to https://vcp-scanner.pages.dev
+- PWA manifest + service worker working
+
+### US-007: E2E verification ✅
+- Worker: https://vcp-scanner.vcp-scanner.workers.dev
+- All API endpoints return 200
+- TypeScript: 0 errors in worker/
+- Zero Node.js-only deps
+
+## Key Files Changed
+- wrangler.toml (new)
+- worker/ (new — src/index.ts, db.ts, schema.ts, providers/yahoo.ts)
+- web/src/api/client.ts (VITE_API_URL support)
+
+## Known Issues
+- Scan run status stays "running" — never finalized to "success"
+- marketSummary in alerts shows 0/0 until scan finalization is fixed
+- wrangler.toml missing pages_build_output_dir field
+
+## Production URLs
+- Worker API: https://vcp-scanner.vcp-scanner.workers.dev
+- Frontend: https://vcp-scanner.pages.dev

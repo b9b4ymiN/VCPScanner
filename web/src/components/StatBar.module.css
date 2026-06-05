@@ -1,17 +1,22 @@
 .bar {
   display: flex;
   align-items: center;
-  gap: var(--space-6);
-  padding: var(--space-3) var(--space-4);
+  gap: var(--space-3);
+  padding: 8px var(--space-3);
   border-bottom: 1px solid var(--bg-border);
-  background: var(--bg-surface);
-  height: 52px;
+  background: rgba(17, 17, 20, 0.92);
+  height: 44px;
   flex-shrink: 0;
 }
 .item {
   display: flex;
   align-items: center;
-  gap: var(--space-2);
+  gap: 6px;
+  min-width: 74px;
+  padding: 5px 8px;
+  border: 0.5px solid var(--bg-border);
+  border-radius: var(--radius-md);
+  background: var(--bg-elevated);
 }
 .count {
   font: 700 14px/1 var(--font-data);
@@ -47,6 +52,9 @@
   margin-left: auto;
   font: 400 12px/1 var(--font-ui);
   color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 .total strong {
   color: var(--text-primary);
@@ -54,7 +62,7 @@
 }
 .market {
   margin-left: var(--space-4);
-  padding-left: var(--space-4);
+  padding-left: var(--space-3);
   border-left: 1px solid var(--bg-border);
   font: 500 12px/1 var(--font-ui);
   color: var(--text-secondary);
@@ -70,13 +78,16 @@
   font: 500 11px/1 var(--font-data);
   color: var(--orange-400);
   margin-left: var(--space-2);
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
 }
 .scanInfo {
   display: flex;
   align-items: center;
-  gap: var(--space-2);
-  margin-left: var(--space-4);
-  padding-left: var(--space-4);
+  gap: 6px;
+  margin-left: var(--space-2);
+  padding-left: var(--space-3);
   border-left: 1px solid var(--bg-border);
 }
 .scanLabel {
@@ -90,13 +101,37 @@
 
 @media (max-width: 768px) {
   .bar {
-    height: auto;
-    flex-wrap: wrap;
-    gap: var(--space-2) var(--space-4);
-    padding: var(--space-2) var(--space-3);
+    height: 40px;
+    overflow-x: auto;
+    gap: var(--space-2);
+    padding: 6px var(--space-2);
+    scrollbar-width: none;
+  }
+  .bar::-webkit-scrollbar {
+    display: none;
+  }
+  .item {
+    min-width: 66px;
+    height: 28px;
+    padding: 4px 7px;
+  }
+  .count {
+    font-size: 13px;
+  }
+  .label {
+    font-size: 10px;
   }
   .market,
   .scanInfo {
     display: none;
+  }
+  .total {
+    margin-left: 0;
+    white-space: nowrap;
+    height: 28px;
+    padding: 0 8px;
+    border: 0.5px solid var(--bg-border);
+    border-radius: var(--radius-md);
+    background: var(--bg-elevated);
   }
 }

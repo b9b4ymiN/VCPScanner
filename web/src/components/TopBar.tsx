@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { List, Eye } from '@phosphor-icons/react'
+import { Eye, Pulse } from '@phosphor-icons/react'
 import { useUiStore } from '../stores/ui'
 import { useViews, useTrackView } from '../api/hooks'
 import styles from './TopBar.module.css'
@@ -15,10 +15,13 @@ export function TopBar() {
     <header className={styles.bar}>
       <div className={styles.left}>
         <button className={styles.hamburger} onClick={() => setSidebarOpen(true)} aria-label="Open menu">
-          <List size={22} />
+          <Pulse size={18} weight="fill" />
         </button>
         <img className={styles.mark} src="/icon.svg" alt="" aria-hidden="true" />
-        <span className={styles.logo}>VCP Scanner</span>
+        <div className={styles.brand}>
+          <span className={styles.logo}>VCP Scanner</span>
+          <span className={styles.subLogo}>SEPA/VCP Pro Tool</span>
+        </div>
       </div>
       <div className={styles.right}>
         {views && (

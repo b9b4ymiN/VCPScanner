@@ -95,7 +95,7 @@ export function AlertDetailView({ alert, onClose }: Props) {
             <div className={styles.noChart}>No chart data</div>
           )}
           <div className={styles.scoreRow}>
-            <SepaScoreRing score={alert.sepaScore} />
+            <SepaScoreRing score={alert.sepaScore} size={72} />
           </div>
         </div>
 

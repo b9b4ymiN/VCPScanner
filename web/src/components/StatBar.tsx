@@ -1,5 +1,6 @@
 import type { Alert } from '../api/types'
 import { formatIndicator } from '../lib/format'
+import { ChartBar, Crosshair, FunnelSimple, Pulse } from '@phosphor-icons/react'
 import styles from './StatBar.module.css'
 
 interface MarketSummary {
@@ -36,10 +37,12 @@ export function StatBar({ alerts, marketSummary }: Props) {
         <span className={styles.label}>WATCH</span>
       </div>
       <div className={styles.total}>
-        Total: <strong>{alerts.length}</strong>
+        <FunnelSimple size={13} />
+        Total <strong>{alerts.length}</strong>
       </div>
       {marketSummary && (
         <div className={styles.scanInfo}>
+          <ChartBar size={13} />
           <span className={styles.scanLabel}>Scanned</span>
           <span className={styles.scanValue}>{marketSummary.totalScanned}</span>
           <span className={styles.scanLabel}>Passed</span>
@@ -47,9 +50,10 @@ export function StatBar({ alerts, marketSummary }: Props) {
         </div>
       )}
       <div className={styles.market}>
+        <Pulse size={13} />
         SET <span className={styles.marketArrow}>▲</span>
         {marketSummary?.marketScoreC7 != null && (
-          <span className={styles.marketScore}>C7: {formatIndicator(marketSummary.marketScoreC7)}</span>
+          <span className={styles.marketScore}><Crosshair size={12} /> C7 {formatIndicator(marketSummary.marketScoreC7)}</span>
         )}
       </div>
     </div>

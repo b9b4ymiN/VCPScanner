@@ -1,0 +1,1 @@
+This folder contains the built output assets for the worker "vcp-scanner" generated at 2026-05-17T14:19:38.879Z.

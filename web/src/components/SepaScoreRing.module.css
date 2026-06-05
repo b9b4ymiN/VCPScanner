@@ -4,6 +4,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  filter: drop-shadow(0 0 12px rgba(245,105,0,0.08));
 }
 .track {
   stroke: var(--bg-elevated);
@@ -14,6 +15,7 @@
   stroke-linecap: round;
   transform: rotate(-90deg);
   transform-origin: center;
+  animation: score-enter 700ms cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 .value {
   position: absolute;
@@ -32,4 +34,11 @@
   text-transform: uppercase;
   letter-spacing: 0.5px;
   color: var(--text-tertiary);
+}
+
+@keyframes score-enter {
+  from {
+    stroke-dashoffset: 999;
+    opacity: 0.45;
+  }
 }

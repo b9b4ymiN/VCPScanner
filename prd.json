@@ -1,0 +1,43 @@
+{
+  "version": "3.1",
+  "project": "VCP Scanner — Fix Production Data Display",
+  "stories": [
+    {
+      "id": "US-201",
+      "title": "Fix PWA service worker caching stale API responses",
+      "priority": 1,
+      "passes": true,
+      "acceptanceCriteria": [
+        "web/vite.config.ts removes /api/.* runtime caching rule from workbox config",
+        "web/vite.config.ts adds skipWaiting: true and clientsClaim: true to workbox config",
+        "Built sw.js contains skipWaiting/clientsClaim and has zero references to api-cache",
+        "Production sw.js at vcp-scanner.pages.dev/sw.js contains skipWaiting"
+      ]
+    },
+    {
+      "id": "US-202",
+      "title": "Fix frontend API URL to point directly to Worker",
+      "priority": 2,
+      "passes": true,
+      "acceptanceCriteria": [
+        "web/.env.production exists with VITE_API_URL=https://vcp-scanner.vcp-scanner.workers.dev",
+        "Built JS contains https://vcp-scanner.vcp-scanner.workers.dev/api",
+        "Production JS at vcp-scanner.pages.dev contains Worker URL",
+        "Worker API returns data: /api/alerts has total > 0, /api/portfolio returns portfolio object"
+      ]
+    },
+    {
+      "id": "US-203",
+      "title": "Verify production deployment works end-to-end",
+      "priority": 3,
+      "passes": true,
+      "acceptanceCriteria": [
+        "curl vcp-scanner.pages.dev loads HTML with correct JS asset reference",
+        "curl vcp-scanner.pages.dev/sw.js contains skipWaiting",
+        "Worker API /api/alerts returns JSON with total >= 0 (not HTML)",
+        "Worker API /api/portfolio returns JSON with portfolio object",
+        "Worker CORS headers include access-control-allow-origin: *"
+      ]
+    }
+  ]
+}

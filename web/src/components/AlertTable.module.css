@@ -3,15 +3,17 @@
   overflow-y: auto;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
+  background: var(--bg-canvas);
 }
 .table {
   width: 100%;
   border-collapse: collapse;
   font-family: var(--font-ui);
+  min-width: 980px;
 }
 .table thead th {
-  padding: 0 var(--space-4);
-  height: 36px;
+  padding: 0 var(--space-3);
+  height: 34px;
   font: 500 11px var(--font-ui);
   letter-spacing: 0.5px;
   text-transform: uppercase;
@@ -67,6 +69,19 @@
 }
 
 @media (max-width: 768px) {
+  .wrapper {
+    overflow-x: hidden;
+    padding: var(--space-2);
+  }
+  .table,
+  .table tbody {
+    display: block;
+    min-width: 0;
+    width: 100%;
+  }
+  .table thead {
+    display: none;
+  }
   .colVcp,
   .colPivot,
   .colGrowth,

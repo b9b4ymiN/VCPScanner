@@ -1,4 +1,5 @@
 import type { AlertLevel } from '../api/types'
+import { MagnifyingGlass, SlidersHorizontal } from '@phosphor-icons/react'
 import styles from './FilterBar.module.css'
 
 interface Props {
@@ -61,7 +62,7 @@ export function FilterBar({
       </div>
       <div className={styles.controls}>
         <label className={styles.scoreLabel}>
-          Score:
+          <SlidersHorizontal size={13} />
           <select
             className={styles.select}
             value={minScore}
@@ -78,10 +79,12 @@ export function FilterBar({
         <input
           className={styles.search}
           type="text"
-          placeholder="Search symbol..."
+          placeholder="Search..."
           value={searchQuery}
           onChange={e => onSearchChange(e.target.value)}
+          aria-label="Search symbol"
         />
+        <MagnifyingGlass className={styles.searchIcon} size={14} />
       </div>
     </div>
   )
